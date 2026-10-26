@@ -2,9 +2,9 @@
 <html lang="de" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>FinanzOS</title>
-  
+
   <!-- Saubere PWA-Verknüpfung -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0B0E14" />
@@ -12,7 +12,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <style>
-    /* ... hier geht dein bisheriges CSS ganz normal weiter ... */
     :root[data-theme="dark"] {
       --bg: #0B0E14;
       --card: #131722;
@@ -22,23 +21,38 @@
       --muted: #7A8599;
       --accent: #00D09C;
       --accent-dim: rgba(0, 208, 156, 0.14);
-      --danger: #FF5252;
-      --warning: #FFB74D;
-      --nav-bg: rgba(19, 23, 34, 0.88);
+      --danger: #EB5757;
+      --danger-dim: rgba(235, 87, 87, 0.14);
+      --nav-bg: rgba(15, 19, 28, 0.92);
+      --ambient-glow: radial-gradient(circle at 50% 0%, rgba(0, 208, 156, 0.08) 0%, transparent 68%);
     }
 
     :root[data-theme="light"] {
       --bg: #F5F7FA;
       --card: #FFFFFF;
-      --card-hover: #F0F3F8;
-      --border: #E4E9F0;
+      --card-hover: #EDF1F7;
+      --border: #E2E8F0;
       --text: #0F141C;
-      --muted: #6C788E;
+      --muted: #64748B;
       --accent: #00B386;
       --accent-dim: rgba(0, 179, 134, 0.12);
-      --danger: #E53935;
-      --warning: #F57C00;
-      --nav-bg: rgba(255, 255, 255, 0.9);
+      --danger: #E14B5A;
+      --danger-dim: rgba(225, 75, 90, 0.12);
+      --nav-bg: rgba(255, 255, 255, 0.92);
+      --ambient-glow: radial-gradient(circle at 50% 0%, rgba(0, 179, 134, 0.08) 0%, transparent 68%);
+    }
+
+    /* Atmosphärische Filter-Stimmungen auf der Startseite */
+    .app-shell[data-mood="income"] {
+      --accent: #00E6A8;
+      --accent-dim: rgba(0, 230, 168, 0.18);
+      --ambient-glow: radial-gradient(circle at 50% 8%, rgba(0, 230, 168, 0.26) 0%, rgba(0, 168, 255, 0.08) 45%, transparent 75%);
+    }
+
+    .app-shell[data-mood="expense"] {
+      --accent: #E85D75;
+      --accent-dim: rgba(232, 93, 117, 0.16);
+      --ambient-glow: radial-gradient(circle at 50% 8%, rgba(232, 93, 117, 0.24) 0%, rgba(168, 50, 75, 0.07) 45%, transparent 75%);
     }
 
     * {
@@ -46,24 +60,30 @@
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", sans-serif;
+      user-select: none;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
     }
 
-    body {
+    /* Verhindert Pull-to-Refresh und Layout-Dehnung auf Android/iOS */
+    html, body {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
       background: #05070A;
       color: var(--text);
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
     }
 
-    /* iPhone Frame */
     .app-shell {
       width: 100%;
-      max-width: 410px;
-      height: 100vh;
-      max-height: 860px;
+      max-width: 420px;
+      height: 100%;
+      max-height: 880px;
       background: var(--bg);
       position: relative;
       overflow: hidden;
@@ -72,13 +92,27 @@
       border-radius: 38px;
       box-shadow: 0 24px 70px rgba(0, 0, 0, 0.65);
       border: 1px solid var(--border);
-      transition: background 0.25s ease, color 0.25s ease;
+      transition: background 0.65s ease, color 0.5s ease;
     }
 
-    @media (max-width: 440px) {
+    .ambient-layer {
+      position: absolute;
+      inset: 0;
+      background: var(--ambient-glow);
+      pointer-events: none;
+      z-index: 0;
+      transition: background 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+      animation: ambientPulse 7s ease-in-out infinite alternate;
+    }
+
+    @keyframes ambientPulse {
+      0% { opacity: 0.75; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.06); }
+    }
+
+    @media (max-width: 460px) {
       .app-shell {
         max-width: 100%;
-        height: 100dvh;
         max-height: none;
         border-radius: 0;
         border: none;
@@ -87,16 +121,35 @@
 
     /* Top Header */
     .topbar {
+      position: relative;
+      z-index: 15;
+      padding: 16px 20px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .topbar-main {
+      display: grid;
+      grid-template-columns: 74px 1fr 74px;
+      align-items: center;
+    }
+
+    .topbar-right {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .topbar-sub {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 20px 10px;
-      z-index: 10;
+      min-height: 34px;
     }
 
-    /* Streak Ring (Habit Loop) */
+    /* Streak Counter */
     .streak-pill {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
       background: var(--card);
@@ -107,18 +160,29 @@
       font-weight: 600;
       color: var(--text);
       cursor: pointer;
-      transition: transform 0.15s ease;
+      width: fit-content;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease;
     }
 
     .streak-pill:active {
-      transform: scale(0.95);
+      transform: scale(0.92);
     }
 
-    .month-nav {
+    /* Period Navigation */
+    .period-nav {
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: center;
+      gap: 10px;
       font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      text-align: center;
+    }
+
+    .screen-header-title {
+      text-align: center;
+      font-size: 15px;
       font-weight: 600;
       letter-spacing: -0.2px;
     }
@@ -134,140 +198,184 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform 0.15s ease, background 0.2s ease;
-      position: relative;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+      flex-shrink: 0;
     }
 
     .icon-btn:active {
-      transform: scale(0.92);
+      transform: scale(0.88);
     }
 
     .icon-btn.active-filter {
       border-color: var(--accent);
       color: var(--accent);
+      background: var(--accent-dim);
     }
 
-    /* Main Content Area */
+    /* Granularity Pills (Tag, Woche, Monat, Zeitraum) */
+    .granularity-bar {
+      display: inline-flex;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .gran-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 9px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .gran-btn.active {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    /* Main Screens */
     .screen {
+      position: relative;
+      z-index: 5;
       flex: 1;
       overflow-y: auto;
-      padding: 10px 20px 105px;
+      overscroll-behavior-y: contain;
+      padding: 6px 20px 104px;
       display: none;
-      animation: fadeIn 0.2s ease;
+      opacity: 0;
+      transform: translateY(10px);
     }
 
     .screen.active {
       display: block;
+      animation: screenEnter 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
     .screen::-webkit-scrollbar {
       display: none;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
+    @keyframes screenEnter {
+      from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Fullscreen Overlay Screens (Add/Edit/Onboarding/Paywall) */
+    /* Fullscreen Modals */
     .fullscreen-modal {
       position: absolute;
       inset: 0;
       background: var(--bg);
-      z-index: 50;
+      z-index: 60;
       display: none;
       flex-direction: column;
       padding: 20px;
       overflow-y: auto;
-      animation: slideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+      overscroll-behavior-y: contain;
+      animation: modalSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .fullscreen-modal.open {
       display: flex;
     }
 
-    @keyframes slideUp {
-      from { transform: translateY(100%); opacity: 0.6; }
+    @keyframes modalSlideUp {
+      from { transform: translateY(100%); opacity: 0.4; }
       to { transform: translateY(0); opacity: 1; }
     }
 
-    /* Hero Value & Chart */
+    /* Custom Bottom-Sheet Picker (für Kategorien-Auswahl) */
+    .sheet-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(6px);
+      z-index: 80;
+      display: none;
+      align-items: flex-end;
+      animation: fadeSlow 0.45s ease;
+    }
+
+    .sheet-backdrop.open {
+      display: flex;
+    }
+
+    .sheet-box {
+      width: 100%;
+      max-height: 72%;
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      border-radius: 26px 26px 0 0;
+      padding: 18px 20px 28px;
+      overflow-y: auto;
+      animation: sheetUp 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes sheetUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    @keyframes fadeSlow {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Hero Block & Donut */
     .hero-block {
       text-align: center;
-      margin: 8px 0 16px;
+      margin: 6px 0 12px;
     }
 
     .hero-label {
-      font-size: 12px;
+      font-size: 11px;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 1px;
       margin-bottom: 4px;
+      transition: color 0.5s ease;
     }
 
     .hero-amount {
       font-size: 34px;
       font-weight: 700;
       letter-spacing: -1px;
+      transition: color 0.5s ease, transform 0.5s ease;
     }
 
     .donut-wrap {
       position: relative;
-      width: 190px;
-      height: 190px;
-      margin: 14px auto 20px;
+      width: 196px;
+      height: 196px;
+      margin: 10px auto 18px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    /* Zeigarnik Prompt (Unfinished Task Nudge) */
-    .nudge-banner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: var(--accent-dim);
-      border: 1px solid rgba(0, 208, 156, 0.3);
-      border-radius: 14px;
-      padding: 10px 14px;
-      margin-bottom: 16px;
-      cursor: pointer;
-      transition: transform 0.15s ease;
+    .donut-segment {
+      transition: stroke-dasharray 0.85s cubic-bezier(0.22, 1, 0.36, 1), stroke-dashoffset 0.85s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.6s ease;
     }
 
-    .nudge-banner:active {
-      transform: scale(0.98);
-    }
-
-    .nudge-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .pulse-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 0 4px rgba(0, 208, 156, 0.25);
-    }
-
-    /* Filter Dropdown */
+    /* Filter Dropdown (direkt unter dem Filter-Icon rechts) */
     .filter-pop {
       position: absolute;
-      top: 62px;
+      top: 98px;
       right: 20px;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 6px;
-      width: 175px;
-      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.45);
+      width: 185px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
       display: none;
-      z-index: 30;
+      z-index: 40;
+      animation: fadeSlow 0.35s ease;
     }
 
     .filter-pop.open {
@@ -284,6 +392,7 @@
       align-items: center;
       justify-content: space-between;
       color: var(--text);
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
     .filter-opt.selected {
@@ -292,7 +401,7 @@
       font-weight: 600;
     }
 
-    /* Clean List Items */
+    /* Lists */
     .list-group {
       display: flex;
       flex-direction: column;
@@ -308,11 +417,11 @@
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      transition: background 0.15s ease, transform 0.12s ease;
+      transition: background 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease;
     }
 
     .list-item:active {
-      transform: scale(0.985);
+      transform: scale(0.975);
       background: var(--card-hover);
     }
 
@@ -350,18 +459,25 @@
       text-align: right;
     }
 
-    .pos { color: var(--accent); }
+    .pos { color: #00D09C; }
     .neg { color: var(--text); }
 
-    /* Subcategory indent */
     .sub-indent {
       margin-left: 22px;
     }
 
-    /* Add Button Below Lists */
+    .empty-hint {
+      text-align: center;
+      padding: 28px 16px;
+      color: var(--muted);
+      font-size: 13px;
+      border: 1px dashed var(--border);
+      border-radius: 16px;
+    }
+
     .add-row-btn {
       width: 100%;
-      margin-top: 14px;
+      margin-top: 12px;
       padding: 14px;
       border-radius: 16px;
       background: var(--card);
@@ -371,15 +487,16 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: border-color 0.2s, color 0.2s;
+      transition: all 0.4s ease;
     }
 
-    .add-row-btn:hover, .add-row-btn:active {
+    .add-row-btn:active {
       border-color: var(--accent);
       color: var(--accent);
+      transform: scale(0.98);
     }
 
-    /* Bottom Navigation */
+    /* Exakt zentrierte 5-Spalten Reiterleiste unten */
     .bottom-nav {
       position: absolute;
       bottom: 0;
@@ -387,28 +504,30 @@
       right: 0;
       height: 78px;
       background: var(--nav-bg);
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(18px);
       border-top: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      padding: 0 10px 10px;
-      z-index: 25;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      place-items: center;
+      padding: 0 6px 8px;
+      z-index: 30;
     }
 
     .nav-btn {
+      width: 100%;
       background: none;
       border: none;
       color: var(--muted);
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 4px;
       font-size: 10px;
       font-weight: 500;
       cursor: pointer;
-      padding: 6px 12px;
-      transition: color 0.15s ease;
+      padding: 6px 0;
+      transition: color 0.4s ease, transform 0.35s ease;
     }
 
     .nav-btn.active {
@@ -426,12 +545,12 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      box-shadow: 0 6px 20px rgba(0, 208, 156, 0.35);
-      transition: transform 0.15s ease;
+      box-shadow: 0 6px 22px rgba(0, 208, 156, 0.35);
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.5s ease;
     }
 
     .nav-plus:active {
-      transform: scale(0.9);
+      transform: scale(0.88);
     }
 
     /* Form Controls */
@@ -439,7 +558,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 22px;
+      margin-bottom: 20px;
     }
 
     .modal-title {
@@ -469,7 +588,7 @@
       border-radius: 9px;
       color: var(--muted);
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .seg-btn.active {
@@ -488,7 +607,7 @@
       display: block;
     }
 
-    .input, .select {
+    .input {
       width: 100%;
       background: var(--card);
       border: 1px solid var(--border);
@@ -497,9 +616,10 @@
       border-radius: 13px;
       font-size: 15px;
       outline: none;
+      transition: border-color 0.35s ease;
     }
 
-    .input:focus, .select:focus {
+    .input:focus {
       border-color: var(--accent);
     }
 
@@ -509,6 +629,24 @@
       text-align: center;
       padding: 16px;
       letter-spacing: -0.5px;
+    }
+
+    /* Custom Designed Picker Trigger */
+    .picker-trigger {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: border-color 0.35s ease, background 0.35s ease;
+    }
+
+    .picker-trigger:active {
+      background: var(--card-hover);
     }
 
     .toggle-row {
@@ -522,6 +660,7 @@
       margin-bottom: 12px;
       font-size: 14px;
       font-weight: 500;
+      cursor: pointer;
     }
 
     .switch {
@@ -530,8 +669,7 @@
       background: var(--border);
       border-radius: 99px;
       position: relative;
-      cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.4s ease;
     }
 
     .switch::after {
@@ -543,7 +681,7 @@
       position: absolute;
       top: 3px;
       left: 3px;
-      transition: transform 0.2s;
+      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .switch.on {
@@ -565,18 +703,18 @@
       font-weight: 700;
       cursor: pointer;
       margin-top: 8px;
-      transition: transform 0.12s ease;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
     }
 
     .primary-btn:active {
-      transform: scale(0.98);
+      transform: scale(0.97);
     }
 
     .delete-btn {
       width: 100%;
       background: transparent;
       color: var(--danger);
-      border: 1px solid rgba(255, 82, 82, 0.35);
+      border: 1px solid rgba(235, 87, 87, 0.35);
       padding: 13px;
       border-radius: 14px;
       font-size: 14px;
@@ -586,24 +724,34 @@
       display: none;
     }
 
-    /* Color & Icon Pickers */
+    /* Große Farb- und Icon-Auswahl */
     .swatch-grid {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
       gap: 10px;
-      flex-wrap: wrap;
     }
 
     .swatch {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid transparent;
+      margin: 0 auto;
+      transition: transform 0.35s ease, border-color 0.35s ease;
     }
 
     .swatch.selected {
       border-color: var(--text);
-      transform: scale(1.1);
+      transform: scale(1.16);
+    }
+
+    .icon-group-title {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin: 12px 0 6px;
     }
 
     .icon-grid {
@@ -622,34 +770,47 @@
       justify-content: center;
       color: var(--muted);
       cursor: pointer;
+      transition: all 0.35s ease;
     }
 
     .icon-choice.selected {
       border-color: var(--accent);
       color: var(--accent);
       background: var(--accent-dim);
+      transform: scale(1.06);
     }
 
-    /* Loss Aversion Pill */
-    .loss-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 11px;
-      border-radius: 99px;
+    /* Auswertung (Aussagekräftige Karten & Balken) */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .kpi-label {
       font-size: 11px;
-      font-weight: 500;
-      background: rgba(255, 183, 77, 0.12);
-      color: var(--warning);
-      margin-top: 8px;
+      color: var(--muted);
+      margin-bottom: 4px;
     }
 
-    /* Bar Chart in Analytics */
+    .kpi-val {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
     .chart-card {
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 18px;
-      padding: 18px;
+      padding: 16px;
       margin-bottom: 14px;
     }
 
@@ -657,10 +818,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       font-size: 13px;
       font-weight: 600;
-      color: var(--muted);
+      color: var(--text);
     }
 
     .bar-row {
@@ -668,8 +829,8 @@
       align-items: flex-end;
       justify-content: space-between;
       height: 130px;
-      gap: 10px;
-      padding-top: 10px;
+      gap: 8px;
+      padding-top: 12px;
     }
 
     .bar-col {
@@ -694,7 +855,7 @@
     .bar {
       width: 10px;
       border-radius: 4px;
-      transition: height 0.35s ease;
+      transition: height 0.75s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .bar-lbl {
@@ -702,49 +863,107 @@
       color: var(--muted);
     }
 
-    /* Onboarding Carousel */
-    .onboard-slide {
+    .bar-val-top {
+      font-size: 9px;
+      color: var(--muted);
+    }
+
+    .cat-breakdown-row {
+      margin-bottom: 12px;
+    }
+
+    .cat-breakdown-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 5px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 7px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* Onboarding Journey (Langsame, atmosphärische Reise) */
+    .journey-stage {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 20px 10px;
+      padding: 10px;
+      animation: journeyFade 1.1s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .onboard-graphic {
-      width: 120px;
-      height: 120px;
-      border-radius: 32px;
+    @keyframes journeyFade {
+      from { opacity: 0; transform: translateY(22px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .journey-orb {
+      width: 118px;
+      height: 118px;
+      border-radius: 36px;
       background: var(--accent-dim);
-      border: 1px solid rgba(0, 208, 156, 0.3);
+      border: 1px solid rgba(0, 208, 156, 0.35);
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--accent);
-      margin-bottom: 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 50px rgba(0, 208, 156, 0.2);
+      animation: orbFloat 4s ease-in-out infinite alternate;
     }
 
-    .onboard-title {
-      font-size: 24px;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      margin-bottom: 10px;
+    @keyframes orbFloat {
+      from { transform: translateY(-4px); }
+      to { transform: translateY(6px); }
     }
 
-    .onboard-sub {
-      font-size: 14px;
+    .chip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 16px;
+    }
+
+    .Preset-chip {
+      padding: 9px 14px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: var(--card);
       color: var(--muted);
-      line-height: 1.5;
-      max-width: 280px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.45s ease;
+    }
+
+    .Preset-chip.selected {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      color: var(--text);
     }
 
     .dots {
       display: flex;
       gap: 6px;
       justify-content: center;
-      margin: 20px 0;
+      margin: 16px 0;
     }
 
     .dot {
@@ -752,43 +971,14 @@
       height: 6px;
       border-radius: 99px;
       background: var(--border);
-      transition: all 0.2s;
+      transition: all 0.55s ease;
     }
 
     .dot.active {
-      width: 20px;
+      width: 22px;
       background: var(--accent);
     }
 
-    .auth-btn {
-      width: 100%;
-      padding: 14px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      cursor: pointer;
-      margin-bottom: 10px;
-    }
-
-    /* Pro Badge */
-    .pro-tag {
-      font-size: 10px;
-      font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 6px;
-      background: var(--accent-dim);
-      color: var(--accent);
-      text-transform: uppercase;
-    }
-
-    /* Toast micro-feedback */
     .toast {
       position: absolute;
       top: 18px;
@@ -800,8 +990,8 @@
       border-radius: 99px;
       font-size: 12px;
       font-weight: 700;
-      z-index: 100;
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 120;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .toast.show {
@@ -810,72 +1000,87 @@
   </style>
 </head>
 <body>
-  <div class="app-shell">
-    <!-- Micro-Feedback Toast -->
+  <div id="appShell" class="app-shell" data-mood="neutral">
+    <div class="ambient-layer"></div>
     <div id="toast" class="toast">Gespeichert</div>
 
-    <!-- Top Header -->
+    <!-- TOP HEADER (Zahnrad auf jeder Seite oben rechts, Filter darunter auf Start) -->
     <div class="topbar">
-      <!-- Streak Ring -->
-      <div class="streak-pill" onclick="showToast('5 Tage Fokus-Serie aktiv')">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="9" stroke="var(--border)" stroke-width="2.5"/>
-          <circle cx="12" cy="12" r="9" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="56" stroke-dashoffset="12" stroke-linecap="round"/>
-        </svg>
-        <span id="streakCount">5T</span>
+      <div class="topbar-main">
+        <!-- Links: Streak Counter -->
+        <div class="streak-pill" onclick="showToast(state.streak + ' Tage Fokus-Serie')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9" stroke="var(--border)" stroke-width="2.5"/>
+            <circle cx="12" cy="12" r="9" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="56" stroke-dashoffset="14" stroke-linecap="round"/>
+          </svg>
+          <span id="streakCount">1T</span>
+        </div>
+
+        <!-- Mitte: Zeitnavigation (Start/Investments/Auswertung) ODER Titel (Kategorien) -->
+        <div id="periodNavWrap" class="period-nav">
+          <button class="icon-btn" style="width:28px;height:28px" onclick="shiftPeriod(-1)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <span id="periodLabel" onclick="openCustomRangeIfNeeded()" style="cursor:pointer">Oktober 2026</span>
+          <button class="icon-btn" style="width:28px;height:28px" onclick="shiftPeriod(1)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+        <div id="staticHeaderTitle" class="screen-header-title" style="display:none">Kategorien</div>
+
+        <!-- Rechts: Einstellungen-Zahnrad (Auf JEDER Seite) -->
+        <div class="topbar-right">
+          <button class="icon-btn" onclick="openSettings()" title="Einstellungen">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
-      <!-- Month Selector -->
-      <div class="month-nav">
-        <button class="icon-btn" style="width:28px;height:28px" onclick="changeMonth(-1)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
-        <span id="monthLabel">Oktober 2026</span>
-        <button class="icon-btn" style="width:28px;height:28px" onclick="changeMonth(1)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      <!-- Zweite Zeile (Nur auf Startseite sichtbar: Zeitraum-Körnung links, Filter-Icon rechts unter Zahnrad) -->
+      <div id="homeSubBar" class="topbar-sub">
+        <div class="granularity-bar">
+          <button class="gran-btn" data-gran="day" onclick="setGranularity('day')">Tag</button>
+          <button class="gran-btn" data-gran="week" onclick="setGranularity('week')">Woche</button>
+          <button class="gran-btn active" data-gran="month" onclick="setGranularity('month')">Monat</button>
+          <button class="gran-btn" data-gran="range" onclick="setGranularity('range')">Zeitraum</button>
+        </div>
+
+        <button id="filterBtn" class="icon-btn" onclick="toggleFilterPop()" title="Filter">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+          </svg>
         </button>
       </div>
-
-      <!-- Right Action: Filter on Home, Settings on Analytics -->
-      <button id="topRightBtn" class="icon-btn" onclick="handleTopRight()">
-        <svg id="filterIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-        </svg>
-      </button>
     </div>
 
-    <!-- Filter Popover (Start Screen) -->
+    <!-- Filter Popover (Startseite unter dem Filter-Icon) -->
     <div id="filterPop" class="filter-pop">
       <div class="filter-opt selected" data-filter="actual" onclick="setFilter('actual')">Vermögen</div>
+      <div class="filter-opt" data-filter="income" onclick="setFilter('income')">Einnahmen</div>
+      <div class="filter-opt" data-filter="expense" onclick="setFilter('expense')">Ausgaben</div>
       <div class="filter-opt" data-filter="loans" onclick="setFilter('loans')">Inkl. Leihen</div>
       <div class="filter-opt" data-filter="invest" onclick="setFilter('invest')">Investitionen</div>
       <div class="filter-opt" data-filter="all" onclick="setFilter('all')">Gesamt</div>
     </div>
 
-    <!-- 1. HOME SCREEN -->
+    <!-- 1. STARTSEITE -->
     <div id="screen-home" class="screen active">
-      <!-- Zeigarnik Nudge Banner -->
-      <div id="zeigarnikBanner" class="nudge-banner" onclick="openEntryModal()">
-        <div class="nudge-left">
-          <div class="pulse-dot"></div>
-          <span>Heute noch offen</span>
-        </div>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-      </div>
-
       <div class="hero-block">
         <div id="filterTitle" class="hero-label">Vermögen</div>
         <div id="homeTotal" class="hero-amount">0,00 €</div>
       </div>
 
       <div class="donut-wrap">
-        <svg id="donutSvg" width="190" height="190" viewBox="0 0 190 190"></svg>
+        <svg id="donutSvg" width="196" height="196" viewBox="0 0 196 196"></svg>
       </div>
 
       <div id="homeList" class="list-group"></div>
     </div>
 
-    <!-- 2. CATEGORIES SCREEN -->
+    <!-- 2. KATEGORIEN -->
     <div id="screen-categories" class="screen">
       <div id="catList" class="list-group"></div>
       <button class="add-row-btn" onclick="openCategoryModal()">
@@ -883,17 +1088,12 @@
       </button>
     </div>
 
-    <!-- 3. INVESTMENTS SCREEN -->
+    <!-- 3. INVESTMENTS -->
     <div id="screen-investments" class="screen">
       <div class="hero-block">
         <div class="hero-label">Portfolio</div>
         <div id="invTotal" class="hero-amount">0,00 €</div>
         <div id="invGain" style="font-size:13px;font-weight:600;color:var(--accent);margin-top:4px;">+0,00 € (0,0%)</div>
-        <!-- Loss Aversion Indicator -->
-        <div id="inflationWarning" class="loss-pill">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <span id="inflationLossText">-0,00 € Kaufkraftverlust p.a. auf Cash</span>
-        </div>
       </div>
 
       <div id="invList" class="list-group"></div>
@@ -902,26 +1102,53 @@
       </button>
     </div>
 
-    <!-- 4. ANALYTICS SCREEN -->
+    <!-- 4. AUSWERTUNG (Konkret & Informativ) -->
     <div id="screen-analytics" class="screen">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Sparquote</div>
+          <div id="kpiSavingsRate" class="kpi-val" style="color:var(--accent)">0%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Netto-Cashflow</div>
+          <div id="kpiNetCashflow" class="kpi-val">0,00 €</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Ø pro Tag (Ausgaben)</div>
+          <div id="kpiDailyBurn" class="kpi-val">0,00 €</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Top-Kategorie</div>
+          <div id="kpiTopCat" class="kpi-val" style="font-size:15px">–</div>
+        </div>
+      </div>
+
       <div class="chart-card">
         <div class="chart-header">
-          <span>Cashflow (6M)</span>
-          <span style="color:var(--accent)">Einnahmen vs. Ausgaben</span>
+          <span>Einnahmen vs. Ausgaben (6M)</span>
+          <span id="cashflowSummaryLabel" style="color:var(--muted);font-size:11px"></span>
         </div>
         <div id="cashflowBars" class="bar-row"></div>
       </div>
 
-      <div class="chart-card" onclick="handleProChartClick()" style="cursor:pointer">
+      <div class="chart-card">
         <div class="chart-header">
-          <span>10-Jahres Zinseszins</span>
-          <span id="proBadgeChart" class="pro-tag">Pro</span>
+          <span>Ausgaben nach Kategorie</span>
+          <span style="color:var(--muted);font-size:11px">Anteil</span>
+        </div>
+        <div id="analyticsCatBreakdown"></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-header">
+          <span>Investment-Projektion (Zinseszins)</span>
+          <span id="projRateHint" style="color:var(--accent);font-size:11px"></span>
         </div>
         <div id="wealthBars" class="bar-row"></div>
       </div>
     </div>
 
-    <!-- BOTTOM NAVIGATION -->
+    <!-- EXAKT ZENTRIERTE 5-SPALTEN REITERLEISTE -->
     <div class="bottom-nav">
       <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg>
@@ -944,10 +1171,10 @@
       </button>
     </div>
 
-    <!-- FULLSCREEN MODAL: ENTRY (+ / EDIT) -->
+    <!-- MODAL: EINTRAG (+ / BEARBEITEN) -->
     <div id="modal-entry" class="fullscreen-modal">
       <div class="modal-header">
-        <span id="entryModalTitle" class="modal-title">Eintrag</span>
+        <span class="modal-title">Buchung</span>
         <button class="icon-btn" onclick="closeModals()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
@@ -963,14 +1190,21 @@
         <input id="entryAmount" type="number" step="0.01" placeholder="0,00" class="input input-amount" />
       </div>
 
+      <!-- Custom Kategorie-Auswahl (ersetzt das hässliche Standard-Select) -->
       <div class="field">
         <label class="field-label">Kategorie</label>
-        <select id="entryCategory" class="select"></select>
+        <div class="picker-trigger" onclick="openCategorySheet('entry')">
+          <div class="item-left" id="entryCategoryDisplay">
+            <div class="cat-icon" style="width:28px;height:28px;background:var(--border)"></div>
+            <span style="font-size:14px;font-weight:600">Kategorie wählen</span>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
       </div>
 
       <div class="field">
-        <label class="field-label">Notiz (optional)</label>
-        <input id="entryNote" type="text" placeholder="Bezeichnung" class="input" />
+        <label class="field-label">Bezeichnung (optional)</label>
+        <input id="entryNote" type="text" placeholder="Notiz" class="input" />
       </div>
 
       <div class="field">
@@ -987,10 +1221,42 @@
       <button id="deleteEntryBtn" class="delete-btn" onclick="deleteEntry()">Löschen</button>
     </div>
 
-    <!-- FULLSCREEN MODAL: CATEGORY (+ / EDIT) -->
+    <!-- CUSTOM BOTTOM-SHEET FÜR KATEGORIE-WAHL -->
+    <div id="categorySheet" class="sheet-backdrop" onclick="closeCategorySheet(event)">
+      <div class="sheet-box" onclick="event.stopPropagation()">
+        <div class="modal-header" style="margin-bottom:14px">
+          <span class="modal-title" style="font-size:15px">Kategorie wählen</span>
+          <button class="icon-btn" style="width:28px;height:28px" onclick="closeCategorySheet()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div id="categorySheetList" class="list-group"></div>
+      </div>
+    </div>
+
+    <!-- MODAL: INDIVIDUELLER ZEITRAUM -->
+    <div id="modal-range" class="fullscreen-modal">
+      <div class="modal-header">
+        <span class="modal-title">Zeitraum wählen</span>
+        <button class="icon-btn" onclick="closeModals()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="field">
+        <label class="field-label">Startdatum</label>
+        <input id="rangeStartInput" type="date" class="input" />
+      </div>
+      <div class="field">
+        <label class="field-label">Enddatum</label>
+        <input id="rangeEndInput" type="date" class="input" />
+      </div>
+      <button class="primary-btn" onclick="applyCustomRange()">Zeitraum anwenden</button>
+    </div>
+
+    <!-- MODAL: KATEGORIE (+ / BEARBEITEN) -->
     <div id="modal-category" class="fullscreen-modal">
       <div class="modal-header">
-        <span id="catModalTitle" class="modal-title">Kategorie</span>
+        <span class="modal-title">Kategorie</span>
         <button class="icon-btn" onclick="closeModals()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
@@ -1003,17 +1269,7 @@
 
       <div class="field">
         <label class="field-label">Name</label>
-        <input id="catName" type="text" placeholder="Name" class="input" />
-      </div>
-
-      <div class="field">
-        <label class="field-label">Farbe</label>
-        <div id="colorGrid" class="swatch-grid"></div>
-      </div>
-
-      <div class="field">
-        <label class="field-label">Icon</label>
-        <div id="iconGrid" class="icon-grid"></div>
+        <input id="catName" type="text" placeholder="Kategoriename" class="input" />
       </div>
 
       <div class="toggle-row" onclick="toggleSubcatSwitch()">
@@ -1022,18 +1278,33 @@
       </div>
 
       <div id="parentCatField" class="field" style="display:none">
-        <label class="field-label">Hauptkategorie</label>
-        <select id="catParent" class="select"></select>
+        <label class="field-label">Übergeordnete Kategorie</label>
+        <div class="picker-trigger" onclick="openCategorySheet('parent')">
+          <div class="item-left" id="parentCategoryDisplay">
+            <span style="font-size:14px;font-weight:600">Hauptkategorie wählen</span>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Farbton</label>
+        <div id="colorGrid" class="swatch-grid"></div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Symbol nach Themengebiet</label>
+        <div id="iconGroupsContainer"></div>
       </div>
 
       <button class="primary-btn" onclick="saveCategory()">Speichern</button>
       <button id="deleteCatBtn" class="delete-btn" onclick="deleteCategory()">Löschen</button>
     </div>
 
-    <!-- FULLSCREEN MODAL: INVESTMENT (+ / EDIT) -->
+    <!-- MODAL: INVESTMENT (+ / BEARBEITEN) -->
     <div id="modal-investment" class="fullscreen-modal">
       <div class="modal-header">
-        <span id="invModalTitle" class="modal-title">Investment</span>
+        <span class="modal-title">Investment</span>
         <button class="icon-btn" onclick="closeModals()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
@@ -1041,7 +1312,7 @@
 
       <div class="field">
         <label class="field-label">Bezeichnung</label>
-        <input id="invName" type="text" placeholder="z. B. Welt-Portfolio" class="input" />
+        <input id="invName" type="text" placeholder="z. B. Welt-ETF" class="input" />
       </div>
 
       <div class="field">
@@ -1050,12 +1321,12 @@
       </div>
 
       <div class="field">
-        <label class="field-label">Zinssatz p.a. (%)</label>
+        <label class="field-label">Rendite / Zinssatz p.a. (%)</label>
         <input id="invRate" type="number" step="0.1" value="7.0" class="input" />
       </div>
 
       <div class="field">
-        <label class="field-label">Datum</label>
+        <label class="field-label">Startdatum</label>
         <input id="invDate" type="date" class="input" />
       </div>
 
@@ -1065,7 +1336,7 @@
       </div>
 
       <div id="invDynField" class="field" style="display:none">
-        <label class="field-label">Ratensteigerung p.a. (%)</label>
+        <label class="field-label">Dynamik / Inflationsanpassung p.a. (%)</label>
         <input id="invDyn" type="number" step="0.1" value="2.0" class="input" />
       </div>
 
@@ -1075,7 +1346,7 @@
       </div>
 
       <div id="invFeeField" class="field" style="display:none">
-        <label class="field-label">Kosten (€)</label>
+        <label class="field-label">Gebühr (€)</label>
         <input id="invFee" type="number" step="0.01" value="0.99" class="input" />
       </div>
 
@@ -1083,7 +1354,7 @@
       <button id="deleteInvBtn" class="delete-btn" onclick="deleteInvestment()">Löschen</button>
     </div>
 
-    <!-- FULLSCREEN MODAL: SETTINGS -->
+    <!-- MODAL: EINSTELLUNGEN -->
     <div id="modal-settings" class="fullscreen-modal">
       <div class="modal-header">
         <span class="modal-title">Einstellungen</span>
@@ -1097,115 +1368,153 @@
         <div id="themeSwitch" class="switch on"></div>
       </div>
 
-      <div class="toggle-row" onclick="openPaywall()">
-        <span>FinanzOS Pro</span>
-        <span id="settingsProStatus" class="pro-tag">Testen</span>
+      <div class="toggle-row" onclick="toggleDailyNotification()">
+        <span>Tägliche Handy-Erinnerung</span>
+        <div id="notifSwitch" class="switch"></div>
+      </div>
+
+      <div id="notifTimeField" class="field" style="display:none">
+        <label class="field-label">Erinnerungszeit</label>
+        <input id="notifTimeInput" type="time" value="20:00" class="input" onchange="saveNotificationTime()" />
       </div>
 
       <div class="list-group" style="margin-top:12px">
         <div class="list-item" onclick="exportCSV()">
-          <span class="item-title">CSV Export</span>
-          <span class="pro-tag">Pro</span>
+          <span class="item-title">CSV Datenexport</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
         </div>
         <div class="list-item" onclick="replayOnboarding()">
-          <span class="item-title">Einführung anzeigen</span>
+          <span class="item-title">Visuelle Einführung starten</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
         </div>
+        <div class="list-item" onclick="resetAllData()">
+          <span class="item-title" style="color:var(--danger)">Alle Daten zurücksetzen</span>
+        </div>
       </div>
     </div>
 
-    <!-- FULLSCREEN MODAL: ONBOARDING & LOGIN (Trust First, No Paywall) -->
+    <!-- MODAL: VISUELLE EINFÜHRUNGSREISE (Beim ersten Öffnen, ohne vorgefüllte Fremddaten) -->
     <div id="modal-onboarding" class="fullscreen-modal">
-      <div id="onboardSlideContainer" class="onboard-slide"></div>
+      <div id="onboardStage" class="journey-stage"></div>
       <div id="onboardDots" class="dots"></div>
       <div id="onboardActions"></div>
-    </div>
-
-    <!-- FULLSCREEN MODAL: SUBTLE PRO PAYWALL (Triggered only on Pro features) -->
-    <div id="modal-paywall" class="fullscreen-modal">
-      <div class="modal-header">
-        <span class="pro-tag">FinanzOS Pro</span>
-        <button class="icon-btn" onclick="closeModals()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-        </button>
-      </div>
-
-      <div style="text-align:center;margin:18px 0 24px">
-        <div class="onboard-title">Maximale Weitsicht.</div>
-        <div class="onboard-sub" style="margin:0 auto">10-Jahres-Zinseszins-Simulation, automatische Raten-Dynamik und unbegrenzter CSV-Datenexport.</div>
-      </div>
-
-      <div class="list-group" style="margin-bottom:22px">
-        <div class="list-item" style="cursor:default">
-          <span class="item-title">7 Tage kostenlos testen</span>
-          <span style="color:var(--accent);font-weight:700">0,00 €</span>
-        </div>
-        <div class="list-item" style="cursor:default">
-          <span class="item-title">Danach monatlich kündbar</span>
-          <span style="color:var(--muted);font-weight:600">2,99 € / Mo.</span>
-        </div>
-      </div>
-
-      <button class="primary-btn" onclick="activatePro()">7 Tage kostenlos starten</button>
-      <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:12px">Jederzeit mit einem Klick in den Einstellungen kündbar.</div>
     </div>
   </div>
 
   <script>
-    const ICONS = {
-      home: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
-      cart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
-      car: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="8" rx="2"/><path d="M5 11l2-5h10l2 5"/></svg>',
-      work: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>',
-      coffee: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>',
-      shield: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
+    // Sortierte, umfangreiche Icon-Bibliothek im einheitlichen Linienstil
+    const ICON_GROUPS = {
+      'Wohnen & Alltag': {
+        home: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+        bolt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+        wifi: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>',
+        key: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3"/></svg>',
+        couch: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="8" width="16" height="8" rx="2"/><path d="M2 12v4h20v-4M6 16v3M18 16v3"/></svg>',
+        tool: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>'
+      },
+      'Essen & Konsum': {
+        cart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
+        coffee: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>',
+        utensils: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
+        bag: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
+        gift: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/></svg>',
+        shirt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>'
+      },
+      'Mobilität & Reisen': {
+        car: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="8" rx="2"/><path d="M5 11l2-5h10l2 5"/><circle cx="7.5" cy="15.5" r="1.5"/><circle cx="16.5" cy="15.5" r="1.5"/></svg>',
+        train: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="15" rx="2"/><path d="M4 11h16M8 18l-2 3M16 18l2 3"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg>',
+        bike: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>',
+        plane: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>',
+        fuel: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="12" height="18" rx="2"/><path d="M15 7h2a2 2 0 0 1 2 2v7a2 2 0 0 0 2 2v0a2 2 0 0 0 2-2V9l-3-3"/><line x1="6" y1="8" x2="12" y2="8"/></svg>',
+        compass: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>'
+      },
+      'Beruf & Finanzen': {
+        work: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>',
+        wallet: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>',
+        trend: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
+        shield: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+        bank: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 22 7 12 2"/><line x1="6" y1="10" x2="6" y2="17"/><line x1="10" y1="10" x2="10" y2="17"/><line x1="14" y1="10" x2="14" y2="17"/><line x1="18" y1="10" x2="18" y2="17"/><line x1="3" y1="20" x2="21" y2="20"/></svg>',
+        award: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>'
+      },
+      'Freizeit, Bildung & Gesundheit': {
+        heart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+        book: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
+        music: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+        dumbbell: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M3 10l7-7M14 21l7-7"/></svg>',
+        laptop: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>',
+        film: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>'
+      }
     };
 
-    const COLORS = ['#00D09C', '#3B82F6', '#8B5CF6', '#F59E0B', '#EC4899', '#14B8A6'];
+    const ICONS = {};
+    Object.values(ICON_GROUPS).forEach(group => Object.assign(ICONS, group));
+
+    // 18 kuratierte Farben
+    const COLORS = [
+      '#00D09C', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9', '#3B82F6',
+      '#6366F1', '#8B5CF6', '#A855F7', '#D946EF', '#EC4899', '#F43F5E',
+      '#EF4444', '#F97316', '#F59E0B', '#EAB308', '#84CC16', '#64748B'
+    ];
+
     const MONTHS = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 
-    let state = JSON.parse(localStorage.getItem('finanzos_v3')) || {
-      month: 9,
-      year: 2026,
-      filter: 'actual',
-      isPro: false,
+    const STARTER_PRESETS = [
+      { key: 'salary', name: 'Gehalt', type: 'income', color: '#00D09C', icon: 'work' },
+      { key: 'housing', name: 'Wohnen', type: 'expense', color: '#3B82F6', icon: 'home' },
+      { key: 'food', name: 'Lebensmittel', type: 'expense', color: '#8B5CF6', icon: 'cart' },
+      { key: 'mobility', name: 'Mobilität', type: 'expense', color: '#F59E0B', icon: 'train' },
+      { key: 'leisure', name: 'Freizeit', type: 'expense', color: '#EC4899', icon: 'coffee' },
+      { key: 'education', name: 'Studium & Bildung', type: 'expense', color: '#06B6D4', icon: 'book' }
+    ];
+
+    function getTodayISO() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    // Standardmäßig komplett OHNE vorgefüllte Fremdbuchungen!
+    const defaultState = {
+      cursorDate: getTodayISO(),
+      granularity: 'month', // 'day' | 'week' | 'month' | 'range'
+      customStart: getTodayISO(),
+      customEnd: getTodayISO(),
+      filter: 'actual', // 'actual' | 'income' | 'expense' | 'loans' | 'invest' | 'all'
       onboarded: false,
-      loggedToday: false,
-      categories: [
-        { id: 'c1', name: 'Gehalt', type: 'income', color: '#00D09C', icon: 'work', parentId: null },
-        { id: 'c2', name: 'Wohnen', type: 'expense', color: '#3B82F6', icon: 'home', parentId: null },
-        { id: 'c3', name: 'Lebensmittel', type: 'expense', color: '#8B5CF6', icon: 'cart', parentId: null },
-        { id: 'c4', name: 'Alltag', type: 'expense', color: '#8B5CF6', icon: 'coffee', parentId: 'c3' },
-        { id: 'c5', name: 'Mobilität', type: 'expense', color: '#F59E0B', icon: 'car', parentId: null }
-      ],
-      entries: [
-        { id: 'e1', type: 'income', amount: 1850, categoryId: 'c1', note: 'Einkommen', date: '2026-10-01', recurring: true },
-        { id: 'e2', type: 'expense', amount: 620, categoryId: 'c2', note: 'Miete', date: '2026-10-02', recurring: true },
-        { id: 'e3', type: 'expense', amount: 210, categoryId: 'c3', note: 'Wocheneinkauf', date: '2026-10-08', recurring: false },
-        { id: 'e4', type: 'expense', amount: 65, categoryId: 'c4', note: 'Café & Lunch', date: '2026-10-12', recurring: false },
-        { id: 'e5', type: 'loan', amount: 140, categoryId: 'c5', note: 'Auslage', date: '2026-10-14', recurring: false }
-      ],
-      investments: [
-        { id: 'i1', name: 'Welt-ETF Sparplan', amount: 300, rate: 7.2, date: '2026-06-01', recurring: true, dyn: 2.0, fee: 0 }
-      ]
+      streak: 1,
+      lastActiveDate: getTodayISO(),
+      notifEnabled: false,
+      notifTime: '20:00',
+      lastNotifDate: '',
+      categories: [],
+      entries: [],
+      investments: []
     };
+
+    let state = JSON.parse(localStorage.getItem('finanzos_v4')) || defaultState;
 
     let currentTab = 'home';
     let editingEntryId = null;
     let editingCatId = null;
     let editingInvId = null;
     let entryType = 'expense';
+    let selectedEntryCatId = null;
+    let selectedParentCatId = null;
+    let sheetMode = 'entry';
     let catType = 'expense';
     let selectedColor = COLORS[0];
     let selectedIcon = 'home';
     let onboardStep = 0;
+    let selectedStarterKeys = ['salary', 'housing', 'food', 'mobility'];
 
     function saveState() {
-      localStorage.setItem('finanzos_v3', JSON.stringify(state));
+      localStorage.setItem('finanzos_v4', JSON.stringify(state));
     }
 
     function haptic() {
-      if (navigator.vibrate) navigator.vibrate(14);
+      if (navigator.vibrate) navigator.vibrate(12);
     }
 
     function showToast(msg) {
@@ -1213,7 +1522,7 @@
       const t = document.getElementById('toast');
       t.textContent = msg;
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 1800);
+      setTimeout(() => t.classList.remove('show'), 2200);
     }
 
     function formatEUR(val) {
@@ -1221,7 +1530,7 @@
     }
 
     function shadeColor(hex, percent) {
-      const num = parseInt(hex.replace('#',''), 16);
+      const num = parseInt((hex || '#00D09C').replace('#',''), 16);
       const amt = Math.round(2.55 * percent);
       const R = Math.min(255, Math.max(0, (num >> 16) + amt));
       const G = Math.min(255, Math.max(0, (num >> 8 & 0x00FF) + amt));
@@ -1236,40 +1545,165 @@
       return parent ? shadeColor(parent.color, 26) : cat.color;
     }
 
-    function monthsDiff(dateStr, targetY, targetM) {
-      const d = new Date(dateStr);
-      return (targetY - d.getFullYear()) * 12 + (targetM - d.getMonth());
+    // Berechnet Start- und Enddatum je nach gewählter Körnung (Tag, Woche, Monat, Zeitraum)
+    function getPeriodBounds() {
+      const cur = new Date(state.cursorDate + 'T12:00:00');
+      if (state.granularity === 'day') {
+        const iso = state.cursorDate;
+        const label = cur.toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: 'numeric' });
+        return { start: iso, end: iso, label };
+      }
+      if (state.granularity === 'week') {
+        const dayOfWeek = (cur.getDay() + 6) % 7; // Montag = 0
+        const mon = new Date(cur);
+        mon.setDate(cur.getDate() - dayOfWeek);
+        const sun = new Date(mon);
+        sun.setDate(mon.getDate() + 6);
+        const toISO = d => d.toISOString().split('T')[0];
+        const label = `${mon.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} – ${sun.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}`;
+        return { start: toISO(mon), end: toISO(sun), label };
+      }
+      if (state.granularity === 'range') {
+        const s = state.customStart <= state.customEnd ? state.customStart : state.customEnd;
+        const e = state.customEnd >= state.customStart ? state.customEnd : state.customStart;
+        const sd = new Date(s + 'T12:00:00');
+        const ed = new Date(e + 'T12:00:00');
+        const label = `${sd.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} – ${ed.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}`;
+        return { start: s, end: e, label };
+      }
+      // Standard: Monat
+      const y = cur.getFullYear();
+      const m = cur.getMonth();
+      const first = `${y}-${String(m + 1).padStart(2, '0')}-01`;
+      const lastDay = new Date(y, m + 1, 0).getDate();
+      const last = `${y}-${String(m + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+      return { start: first, end: last, label: `${MONTHS[m]} ${y}` };
     }
 
-    function getActiveEntries(y, m) {
-      return state.entries.filter(e => {
-        const diff = monthsDiff(e.date, y, m);
-        return e.recurring ? diff >= 0 : diff === 0;
+    function shiftPeriod(dir) {
+      haptic();
+      const cur = new Date(state.cursorDate + 'T12:00:00');
+      if (state.granularity === 'day') {
+        cur.setDate(cur.getDate() + dir);
+      } else if (state.granularity === 'week') {
+        cur.setDate(cur.getDate() + dir * 7);
+      } else if (state.granularity === 'month') {
+        cur.setMonth(cur.getMonth() + dir);
+      } else if (state.granularity === 'range') {
+        openCustomRangeIfNeeded();
+        return;
+      }
+      state.cursorDate = cur.toISOString().split('T')[0];
+      renderAll();
+    }
+
+    function setGranularity(g) {
+      haptic();
+      state.granularity = g;
+      document.querySelectorAll('.gran-btn').forEach(b => b.classList.toggle('active', b.dataset.gran === g));
+      if (g === 'range') {
+        openCustomRangeIfNeeded();
+      }
+      renderAll();
+    }
+
+    function openCustomRangeIfNeeded() {
+      if (state.granularity !== 'range') return;
+      document.getElementById('rangeStartInput').value = state.customStart;
+      document.getElementById('rangeEndInput').value = state.customEnd;
+      document.getElementById('modal-range').classList.add('open');
+    }
+
+    function applyCustomRange() {
+      state.customStart = document.getElementById('rangeStartInput').value || getTodayISO();
+      state.customEnd = document.getElementById('rangeEndInput').value || getTodayISO();
+      closeModals();
+      renderAll();
+    }
+
+    // WICHTIG: Daueraufträge werden erst gebucht, wenn der eingestellte Tag tatsächlich erreicht ist (<= Heute)!
+    function getEntriesInWindow(startISO, endISO) {
+      const todayISO = getTodayISO();
+      const results = [];
+
+      state.entries.forEach(e => {
+        if (!e.recurring) {
+          if (e.date >= startISO && e.date <= endISO) {
+            results.push({ ...e, occDate: e.date });
+          }
+        } else {
+          // Monatliche Wiederholungen ab e.date erzeugen, aber NUR bis maximal heute (todayISO)
+          const orig = new Date(e.date + 'T12:00:00');
+          const origDay = orig.getDate();
+          let y = orig.getFullYear();
+          let m = orig.getMonth();
+
+          for (let i = 0; i < 120; i++) {
+            const maxDay = new Date(y, m + 1, 0).getDate();
+            const day = Math.min(origDay, maxDay);
+            const occISO = `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+            // Liegt der Ausführungstag in der Zukunft (> heute), wird er noch NICHT eingetragen!
+            if (occISO > todayISO || occISO > endISO) break;
+
+            if (occISO >= startISO && occISO >= e.date) {
+              results.push({ ...e, occDate: occISO });
+            }
+
+            m++;
+            if (m > 11) { m = 0; y++; }
+          }
+        }
       });
+
+      return results.sort((a, b) => b.occDate.localeCompare(a.occDate));
     }
 
-    function calcInvestments(y, m) {
+    // Investment-Berechnung: Daueraufträge führen Raten nur bis zum heutigen Stichtag aus
+    function calcInvestmentsUpTo(endISO) {
+      const todayISO = getTodayISO();
+      const effectiveCutISO = endISO < todayISO ? endISO : todayISO;
+      const cutDate = new Date(effectiveCutISO + 'T12:00:00');
+
       let invested = 0;
       let value = 0;
       const items = [];
 
       state.investments.forEach(inv => {
-        const diff = monthsDiff(inv.date, y, m);
-        if (diff < 0) return;
-        const rMonth = Math.pow(1 + (inv.rate || 0) / 100, 1 / 12) - 1;
+        if (inv.date > effectiveCutISO) return;
+        const startD = new Date(inv.date + 'T12:00:00');
+        const origDay = startD.getDate();
+        const rDay = Math.pow(1 + (inv.rate || 0) / 100, 1 / 365) - 1;
+
         let itemIn = 0;
         let itemVal = 0;
 
-        if (inv.recurring) {
-          for (let k = 0; k <= diff; k++) {
+        if (!inv.recurring) {
+          itemIn = inv.amount + (inv.fee || 0);
+          const daysHeld = Math.max(0, Math.floor((cutDate - startD) / 86400000));
+          itemVal = inv.amount * Math.pow(1 + rDay, daysHeld);
+        } else {
+          let y = startD.getFullYear();
+          let m = startD.getMonth();
+          let k = 0;
+          while (k < 240) {
+            const maxDay = new Date(y, m + 1, 0).getDate();
+            const d = Math.min(origDay, maxDay);
+            const occISO = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            if (occISO > effectiveCutISO) break;
+
+            const occDate = new Date(occISO + 'T12:00:00');
             const yearsPassed = Math.floor(k / 12);
             const rateAmt = inv.amount * Math.pow(1 + (inv.dyn || 0) / 100, yearsPassed);
+            const daysHeld = Math.max(0, Math.floor((cutDate - occDate) / 86400000));
+
             itemIn += rateAmt;
-            itemVal = (itemVal + rateAmt) * (1 + rMonth);
+            itemVal += rateAmt * Math.pow(1 + rDay, daysHeld);
+
+            k++;
+            m++;
+            if (m > 11) { m = 0; y++; }
           }
-        } else {
-          itemIn = inv.amount + (inv.fee || 0);
-          itemVal = inv.amount * Math.pow(1 + rMonth, diff + 1);
         }
 
         invested += itemIn;
@@ -1281,11 +1715,22 @@
     }
 
     function renderHome() {
-      document.getElementById('monthLabel').textContent = `${MONTHS[state.month]} ${state.year}`;
-      document.getElementById('zeigarnikBanner').style.display = state.loggedToday ? 'none' : 'flex';
+      const bounds = getPeriodBounds();
+      document.getElementById('periodLabel').textContent = bounds.label;
+      document.getElementById('streakCount').textContent = `${state.streak}T`;
 
-      const entries = getActiveEntries(state.year, state.month);
-      const invData = calcInvestments(state.year, state.month);
+      // Atmosphärische Stimmung (Einnahmen = Smaragd-Futuristisch, Ausgaben = Ruhiges Rubinrot)
+      const shell = document.getElementById('appShell');
+      if (currentTab === 'home' && state.filter === 'income') {
+        shell.setAttribute('data-mood', 'income');
+      } else if (currentTab === 'home' && state.filter === 'expense') {
+        shell.setAttribute('data-mood', 'expense');
+      } else {
+        shell.setAttribute('data-mood', 'neutral');
+      }
+
+      const entries = getEntriesInWindow(bounds.start, bounds.end);
+      const invData = calcInvestmentsUpTo(bounds.end);
 
       let income = 0, expense = 0, loans = 0;
       entries.forEach(e => {
@@ -1296,21 +1741,33 @@
 
       const actualCash = income - expense;
       let displayedTotal = actualCash;
-      const titles = { actual: 'Vermögen', loans: 'Inkl. Leihen', invest: 'Investitionen', all: 'Gesamt' };
+
+      const titles = {
+        actual: 'Vermögen',
+        income: 'Einnahmen',
+        expense: 'Ausgaben',
+        loans: 'Inkl. Leihen',
+        invest: 'Investitionen',
+        all: 'Gesamt'
+      };
       document.getElementById('filterTitle').textContent = titles[state.filter];
 
+      if (state.filter === 'income') displayedTotal = income;
+      if (state.filter === 'expense') displayedTotal = expense;
       if (state.filter === 'loans') displayedTotal = actualCash + loans;
       if (state.filter === 'invest') displayedTotal = invData.value;
       if (state.filter === 'all') displayedTotal = actualCash + loans + invData.value;
 
       document.getElementById('homeTotal').textContent = formatEUR(displayedTotal);
 
-      // Donut Slices
+      // Kreisdiagramm-Segmente je nach Filter
       const slices = [];
       if (state.filter !== 'invest') {
         const grouped = {};
         entries.forEach(e => {
           if (state.filter === 'actual' && e.type === 'loan') return;
+          if (state.filter === 'income' && e.type !== 'income') return;
+          if (state.filter === 'expense' && e.type !== 'expense') return;
           grouped[e.categoryId] = (grouped[e.categoryId] || 0) + e.amount;
         });
         Object.keys(grouped).forEach(cid => {
@@ -1326,57 +1783,80 @@
 
       renderDonut(slices);
 
-      // Clean Transaction List
+      // Transaktionsliste
       const listEl = document.getElementById('homeList');
       listEl.innerHTML = '';
-      entries
-        .filter(e => state.filter !== 'actual' || e.type !== 'loan')
-        .forEach(e => {
-          const cat = state.categories.find(c => c.id === e.categoryId);
-          const color = getCatColor(cat);
-          const sign = e.type === 'income' ? '+' : e.type === 'expense' ? '-' : '⇄ ';
-          const row = document.createElement('div');
-          row.className = 'list-item';
-          row.onclick = () => openEntryModal(e.id);
-          row.innerHTML = `
-            <div class="item-left">
-              <div class="cat-icon" style="background:${color}">${ICONS[cat?.icon || 'home']}</div>
-              <div>
-                <div class="item-title">${e.note || cat?.name || 'Eintrag'}</div>
-                <div class="item-sub">${cat?.name || ''}${e.recurring ? ' · Monatlich' : ''}</div>
-              </div>
+
+      const filteredEntries = entries.filter(e => {
+        if (state.filter === 'actual') return e.type !== 'loan';
+        if (state.filter === 'income') return e.type === 'income';
+        if (state.filter === 'expense') return e.type === 'expense';
+        if (state.filter === 'invest') return false;
+        return true;
+      });
+
+      if (filteredEntries.length === 0 && state.filter !== 'invest') {
+        listEl.innerHTML = `<div class="empty-hint">Keine Buchungen in diesem Zeitraum. Tippe unten auf <b>+</b> zum Eintragen.</div>`;
+        return;
+      }
+
+      filteredEntries.forEach(e => {
+        const cat = state.categories.find(c => c.id === e.categoryId);
+        const color = getCatColor(cat);
+        const sign = e.type === 'income' ? '+' : e.type === 'expense' ? '-' : '⇄ ';
+        const row = document.createElement('div');
+        row.className = 'list-item';
+        row.onclick = () => openEntryModal(e.id);
+        row.innerHTML = `
+          <div class="item-left">
+            <div class="cat-icon" style="background:${color}">${ICONS[cat?.icon || 'home']}</div>
+            <div>
+              <div class="item-title">${e.note || cat?.name || 'Buchung'}</div>
+              <div class="item-sub">${cat?.name || 'Kategorie'} · ${new Date(e.occDate + 'T12:00:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}${e.recurring ? ' · Dauerauftrag' : ''}</div>
             </div>
-            <div class="item-amount ${e.type === 'income' ? 'pos' : 'neg'}">${sign}${formatEUR(e.amount)}</div>
-          `;
-          listEl.appendChild(row);
-        });
+          </div>
+          <div class="item-amount ${e.type === 'income' ? 'pos' : 'neg'}">${sign}${formatEUR(e.amount)}</div>
+        `;
+        listEl.appendChild(row);
+      });
     }
 
     function renderDonut(slices) {
       const svg = document.getElementById('donutSvg');
       svg.innerHTML = '';
-      const r = 74, cx = 95, cy = 95, c = 2 * Math.PI * r;
+      const r = 76, cx = 98, cy = 98, c = 2 * Math.PI * r;
       const total = slices.reduce((s, x) => s + x.val, 0);
 
-      if (total <= 0) {
-        svg.innerHTML = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border)" stroke-width="18"/>`;
-        return;
-      }
+      const bgTrack = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      bgTrack.setAttribute('cx', cx);
+      bgTrack.setAttribute('cy', cy);
+      bgTrack.setAttribute('r', r);
+      bgTrack.setAttribute('fill', 'none');
+      bgTrack.setAttribute('stroke', 'var(--border)');
+      bgTrack.setAttribute('stroke-width', '18');
+      svg.appendChild(bgTrack);
+
+      if (total <= 0) return;
 
       let offset = 0;
       slices.forEach(s => {
         const len = (s.val / total) * c;
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('class', 'donut-segment');
         circle.setAttribute('cx', cx);
         circle.setAttribute('cy', cy);
         circle.setAttribute('r', r);
         circle.setAttribute('fill', 'none');
         circle.setAttribute('stroke', s.color);
         circle.setAttribute('stroke-width', '18');
-        circle.setAttribute('stroke-dasharray', `${Math.max(0, len - 3)} ${c}`);
+        circle.setAttribute('stroke-dasharray', `0 ${c}`);
         circle.setAttribute('stroke-dashoffset', -offset);
         circle.setAttribute('transform', `rotate(-90 ${cx} ${cy})`);
         svg.appendChild(circle);
+
+        requestAnimationFrame(() => {
+          circle.setAttribute('stroke-dasharray', `${Math.max(0, len - 3)} ${c}`);
+        });
         offset += len;
       });
     }
@@ -1384,8 +1864,12 @@
     function renderCategories() {
       const list = document.getElementById('catList');
       list.innerHTML = '';
-      const parents = state.categories.filter(c => !c.parentId);
+      if (state.categories.length === 0) {
+        list.innerHTML = `<div class="empty-hint">Noch keine Kategorien angelegt. Tippe unten auf <b>+</b>.</div>`;
+        return;
+      }
 
+      const parents = state.categories.filter(c => !c.parentId);
       parents.forEach(p => {
         list.appendChild(createCatRow(p, false));
         state.categories
@@ -1403,31 +1887,27 @@
           <div class="cat-icon" style="background:${getCatColor(cat)}">${ICONS[cat.icon || 'home']}</div>
           <div class="item-title">${cat.name}</div>
         </div>
-        <div class="item-sub">${cat.type === 'income' ? '+' : '-'}</div>
+        <div class="item-sub" style="font-weight:700;color:${cat.type === 'income' ? 'var(--accent)' : 'var(--muted)'}">${cat.type === 'income' ? 'Einnahmen' : 'Ausgaben'}</div>
       `;
       return row;
     }
 
     function renderInvestments() {
-      const data = calcInvestments(state.year, state.month);
+      const bounds = getPeriodBounds();
+      const data = calcInvestmentsUpTo(bounds.end);
       const gain = data.value - data.invested;
       const pct = data.invested > 0 ? (gain / data.invested) * 100 : 0;
 
       document.getElementById('invTotal').textContent = formatEUR(data.value);
       document.getElementById('invGain').textContent = `${gain >= 0 ? '+' : ''}${formatEUR(gain)} (${pct.toFixed(1)}%)`;
 
-      // Loss aversion on uninvested cash
-      const entries = getActiveEntries(state.year, state.month);
-      let cash = 0;
-      entries.forEach(e => {
-        if (e.type === 'income') cash += e.amount;
-        if (e.type === 'expense') cash -= e.amount;
-      });
-      const inflationLoss = Math.max(0, cash * 0.02);
-      document.getElementById('inflationLossText').textContent = `-${formatEUR(inflationLoss)} Kaufkraftverlust p.a. auf Cash`;
-
       const list = document.getElementById('invList');
       list.innerHTML = '';
+      if (data.items.length === 0) {
+        list.innerHTML = `<div class="empty-hint">Noch keine Investments oder Sparpläne eingetragen.</div>`;
+        return;
+      }
+
       data.items.forEach(it => {
         const diff = it.itemVal - it.itemIn;
         const row = document.createElement('div');
@@ -1436,11 +1916,11 @@
         row.innerHTML = `
           <div class="item-left">
             <div class="cat-icon" style="background:var(--accent-dim);color:var(--accent)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/></svg>
+              ${ICONS.trend}
             </div>
             <div>
               <div class="item-title">${it.name}</div>
-              <div class="item-sub">${it.rate}% p.a.${it.recurring ? ' · Sparplan' : ''}</div>
+              <div class="item-sub">${it.rate}% p.a.${it.recurring ? ` · Sparplan (+${it.dyn || 0}% Dynamik)` : ''}</div>
             </div>
           </div>
           <div>
@@ -1453,54 +1933,151 @@
     }
 
     function renderAnalytics() {
+      const bounds = getPeriodBounds();
+      const entries = getEntriesInWindow(bounds.start, bounds.end);
+
+      let inc = 0, exp = 0;
+      const byCat = {};
+      entries.forEach(e => {
+        if (e.type === 'income') inc += e.amount;
+        if (e.type === 'expense') {
+          exp += e.amount;
+          byCat[e.categoryId] = (byCat[e.categoryId] || 0) + e.amount;
+        }
+      });
+
+      const net = inc - exp;
+      const savingsRate = inc > 0 ? Math.max(0, Math.round(((inc - exp) / inc) * 100)) : 0;
+      const startD = new Date(bounds.start + 'T12:00:00');
+      const endD = new Date(bounds.end + 'T12:00:00');
+      const daysCount = Math.max(1, Math.round((endD - startD) / 86400000) + 1);
+      const dailyBurn = exp / daysCount;
+
+      let topCatName = '–';
+      let topCatVal = 0;
+      Object.keys(byCat).forEach(cid => {
+        if (byCat[cid] > topCatVal) {
+          topCatVal = byCat[cid];
+          topCatName = state.categories.find(c => c.id === cid)?.name || 'Sonstiges';
+        }
+      });
+
+      document.getElementById('kpiSavingsRate').textContent = `${savingsRate}%`;
+      document.getElementById('kpiNetCashflow').textContent = `${net >= 0 ? '+' : ''}${formatEUR(net)}`;
+      document.getElementById('kpiNetCashflow').style.color = net >= 0 ? 'var(--accent)' : 'var(--danger)';
+      document.getElementById('kpiDailyBurn').textContent = formatEUR(dailyBurn);
+      document.getElementById('kpiTopCat').textContent = topCatName;
+      document.getElementById('cashflowSummaryLabel').textContent = `+${Math.round(inc)} € / -${Math.round(exp)} €`;
+
+      // 1. 6-Monats-Cashflow
       const cfContainer = document.getElementById('cashflowBars');
       cfContainer.innerHTML = '';
+      const refDate = new Date(state.cursorDate + 'T12:00:00');
+
       for (let i = -5; i <= 0; i++) {
-        let m = state.month + i;
-        let y = state.year;
-        if (m < 0) { m += 12; y -= 1; }
-        const entries = getActiveEntries(y, m);
-        let inc = 0, exp = 0;
-        entries.forEach(e => {
-          if (e.type === 'income') inc += e.amount;
-          if (e.type === 'expense') exp += e.amount;
+        const d = new Date(refDate.getFullYear(), refDate.getMonth() + i, 1);
+        const y = d.getFullYear();
+        const m = d.getMonth();
+        const mStart = `${y}-${String(m + 1).padStart(2, '0')}-01`;
+        const mEnd = `${y}-${String(m + 1).padStart(2, '0')}-${String(new Date(y, m + 1, 0).getDate()).padStart(2, '0')}`;
+        const mEntries = getEntriesInWindow(mStart, mEnd);
+
+        let mInc = 0, mExp = 0;
+        mEntries.forEach(e => {
+          if (e.type === 'income') mInc += e.amount;
+          if (e.type === 'expense') mExp += e.amount;
         });
-        const max = Math.max(inc, exp, 2000);
-        const hInc = Math.round((inc / max) * 95);
-        const hExp = Math.round((exp / max) * 95);
+
+        const maxVal = Math.max(mInc, mExp, 500);
+        const hInc = Math.max(4, Math.round((mInc / maxVal) * 86));
+        const hExp = Math.max(4, Math.round((mExp / maxVal) * 86));
 
         const col = document.createElement('div');
         col.className = 'bar-col';
         col.innerHTML = `
+          <span class="bar-val-top">${mInc - mExp >= 0 ? '+' : ''}${Math.round(mInc - mExp)}€</span>
           <div class="bar-pair">
             <div class="bar" style="height:${hInc}px;background:var(--accent)"></div>
-            <div class="bar" style="height:${hExp}px;background:var(--border)"></div>
+            <div class="bar" style="height:${hExp}px;background:var(--danger)"></div>
           </div>
           <span class="bar-lbl">${MONTHS[m].slice(0,3)}</span>
         `;
         cfContainer.appendChild(col);
       }
 
-      document.getElementById('proBadgeChart').textContent = state.isPro ? 'Aktiv' : 'Pro';
+      // 2. Top-Kategorien Aufschlüsselung mit Fortschrittsbalken
+      const breakEl = document.getElementById('analyticsCatBreakdown');
+      breakEl.innerHTML = '';
+      const sortedCats = Object.keys(byCat).sort((a, b) => byCat[b] - byCat[a]);
+
+      if (sortedCats.length === 0) {
+        breakEl.innerHTML = `<div style="font-size:12px;color:var(--muted)">Noch keine Ausgaben im gewählten Zeitraum.</div>`;
+      } else {
+        sortedCats.forEach(cid => {
+          const cat = state.categories.find(c => c.id === cid);
+          const val = byCat[cid];
+          const pct = exp > 0 ? Math.round((val / exp) * 100) : 0;
+          const row = document.createElement('div');
+          row.className = 'cat-breakdown-row';
+          row.innerHTML = `
+            <div class="cat-breakdown-head">
+              <span style="font-weight:600">${cat?.name || 'Kategorie'}</span>
+              <span style="color:var(--muted)">${formatEUR(val)} (${pct}%)</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${pct}%;background:${getCatColor(cat)}"></div>
+            </div>
+          `;
+          breakEl.appendChild(row);
+        });
+      }
+
+      // 3. Zinseszins-Projektion (1J, 3J, 5J, 10J auf Basis aktiver Investments)
       const wContainer = document.getElementById('wealthBars');
       wContainer.innerHTML = '';
-      const years = [2, 4, 6, 8, 10];
-      years.forEach(yr => {
-        const future = calcInvestments(state.year + yr, state.month);
-        const h = Math.min(95, Math.max(12, Math.round((future.value / 65000) * 95)));
+      const horizons = [1, 3, 5, 10];
+      const projections = horizons.map(yr => {
+        let totalFuture = 0;
+        state.investments.forEach(inv => {
+          const rMonth = Math.pow(1 + (inv.rate || 0) / 100, 1 / 12) - 1;
+          const months = yr * 12;
+          if (!inv.recurring) {
+            totalFuture += inv.amount * Math.pow(1 + rMonth, months);
+          } else {
+            let v = 0;
+            for (let k = 0; k < months; k++) {
+              const rateAmt = inv.amount * Math.pow(1 + (inv.dyn || 0) / 100, Math.floor(k / 12));
+              v = (v + rateAmt) * (1 + rMonth);
+            }
+            totalFuture += v;
+          }
+        });
+        return { yr, val: totalFuture };
+      });
+
+      const maxProj = Math.max(...projections.map(p => p.val), 1000);
+      projections.forEach(p => {
+        const h = Math.max(6, Math.round((p.val / maxProj) * 86));
         const col = document.createElement('div');
         col.className = 'bar-col';
         col.innerHTML = `
+          <span class="bar-val-top">${Math.round(p.val).toLocaleString('de-DE')} €</span>
           <div class="bar-pair">
-            <div class="bar" style="height:${h}px;background:${state.isPro ? 'var(--accent)' : 'var(--border)'};width:18px"></div>
+            <div class="bar" style="height:${h}px;background:var(--accent);width:22px"></div>
           </div>
-          <span class="bar-lbl">+${yr}J</span>
+          <span class="bar-lbl">+${p.yr} J.</span>
         `;
         wContainer.appendChild(col);
       });
     }
 
     function renderAll() {
+      // Header-Sichtbarkeit je nach Tab steuern
+      const isCatTab = currentTab === 'categories';
+      document.getElementById('periodNavWrap').style.display = isCatTab ? 'none' : 'flex';
+      document.getElementById('staticHeaderTitle').style.display = isCatTab ? 'block' : 'none';
+      document.getElementById('homeSubBar').style.display = currentTab === 'home' ? 'flex' : 'none';
+
       renderHome();
       renderCategories();
       renderInvestments();
@@ -1508,7 +2085,6 @@
       saveState();
     }
 
-    // Navigation & Filter
     function switchTab(tab) {
       haptic();
       currentTab = tab;
@@ -1516,51 +2092,124 @@
       document.getElementById(`screen-${tab}`).classList.add('active');
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
       document.getElementById('filterPop').classList.remove('open');
-
-      const topBtn = document.getElementById('topRightBtn');
-      if (tab === 'analytics') {
-        topBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
-      } else {
-        topBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>';
-      }
       renderAll();
     }
 
-    function handleTopRight() {
-      if (currentTab === 'analytics') {
-        document.getElementById('modal-settings').classList.add('open');
-      } else {
-        switchTab('home');
-        document.getElementById('filterPop').classList.toggle('open');
-      }
+    function toggleFilterPop() {
+      haptic();
+      document.getElementById('filterPop').classList.toggle('open');
     }
 
     function setFilter(f) {
       haptic();
       state.filter = f;
       document.querySelectorAll('.filter-opt').forEach(o => o.classList.toggle('selected', o.dataset.filter === f));
-      document.getElementById('topRightBtn').classList.toggle('active-filter', f !== 'actual');
+      document.getElementById('filterBtn').classList.toggle('active-filter', f !== 'actual');
       document.getElementById('filterPop').classList.remove('open');
       renderHome();
+      saveState();
     }
 
-    function changeMonth(delta) {
+    function openSettings() {
       haptic();
-      state.month += delta;
-      if (state.month > 11) { state.month = 0; state.year++; }
-      if (state.month < 0) { state.month = 11; state.year--; }
-      renderAll();
+      document.getElementById('notifSwitch').classList.toggle('on', !!state.notifEnabled);
+      document.getElementById('notifTimeField').style.display = state.notifEnabled ? 'block' : 'none';
+      document.getElementById('notifTimeInput').value = state.notifTime || '20:00';
+      document.getElementById('modal-settings').classList.add('open');
     }
 
     function closeModals() {
       document.querySelectorAll('.fullscreen-modal').forEach(m => m.classList.remove('open'));
     }
 
-    // Entry Modal
+    // Custom Kategorie-Bottom-Sheet
+    function openCategorySheet(mode) {
+      haptic();
+      sheetMode = mode;
+      const list = document.getElementById('categorySheetList');
+      list.innerHTML = '';
+
+      const targetType = mode === 'entry'
+        ? (entryType === 'income' ? 'income' : 'expense')
+        : catType;
+
+      const available = state.categories.filter(c => {
+        if (mode === 'parent') return !c.parentId && c.id !== editingCatId && c.type === targetType;
+        return c.type === targetType;
+      });
+
+      if (available.length === 0) {
+        list.innerHTML = `<div class="empty-hint">Noch keine passende Kategorie vorhanden. Lege zuerst eine im Reiter „Kategorien“ an.</div>`;
+      } else {
+        available.forEach(c => {
+          const row = document.createElement('div');
+          row.className = 'list-item' + (c.parentId ? ' sub-indent' : '');
+          row.onclick = () => selectCategoryFromSheet(c.id);
+          row.innerHTML = `
+            <div class="item-left">
+              <div class="cat-icon" style="background:${getCatColor(c)}">${ICONS[c.icon || 'home']}</div>
+              <span class="item-title">${c.name}</span>
+            </div>
+          `;
+          list.appendChild(row);
+        });
+      }
+
+      document.getElementById('categorySheet').classList.add('open');
+    }
+
+    function selectCategoryFromSheet(cid) {
+      haptic();
+      const cat = state.categories.find(c => c.id === cid);
+      if (!cat) return;
+
+      if (sheetMode === 'entry') {
+        selectedEntryCatId = cid;
+        updateEntryCategoryDisplay();
+      } else {
+        selectedParentCatId = cid;
+        updateParentCategoryDisplay();
+      }
+      closeCategorySheet();
+    }
+
+    function updateEntryCategoryDisplay() {
+      const box = document.getElementById('entryCategoryDisplay');
+      const cat = state.categories.find(c => c.id === selectedEntryCatId);
+      if (!cat) {
+        box.innerHTML = `
+          <div class="cat-icon" style="width:28px;height:28px;background:var(--border)"></div>
+          <span style="font-size:14px;font-weight:600;color:var(--muted)">Kategorie wählen</span>
+        `;
+      } else {
+        box.innerHTML = `
+          <div class="cat-icon" style="width:28px;height:28px;background:${getCatColor(cat)}">${ICONS[cat.icon || 'home']}</div>
+          <span style="font-size:14px;font-weight:600">${cat.name}</span>
+        `;
+      }
+    }
+
+    function updateParentCategoryDisplay() {
+      const box = document.getElementById('parentCategoryDisplay');
+      const cat = state.categories.find(c => c.id === selectedParentCatId);
+      if (!cat) {
+        box.innerHTML = `<span style="font-size:14px;font-weight:600;color:var(--muted)">Hauptkategorie wählen</span>`;
+      } else {
+        box.innerHTML = `
+          <div class="cat-icon" style="width:28px;height:28px;background:${getCatColor(cat)}">${ICONS[cat.icon || 'home']}</div>
+          <span style="font-size:14px;font-weight:600">${cat.name}</span>
+        `;
+      }
+    }
+
+    function closeCategorySheet() {
+      document.getElementById('categorySheet').classList.remove('open');
+    }
+
+    // Buchungs-Modal
     function openEntryModal(id = null) {
       haptic();
       editingEntryId = id;
-      const modal = document.getElementById('modal-entry');
       const delBtn = document.getElementById('deleteEntryBtn');
 
       if (id) {
@@ -1570,41 +2219,28 @@
         document.getElementById('entryNote').value = e.note || '';
         document.getElementById('entryDate').value = e.date;
         document.getElementById('entryRecurring').classList.toggle('on', !!e.recurring);
-        populateEntryCategories(e.categoryId);
+        selectedEntryCatId = e.categoryId;
+        updateEntryCategoryDisplay();
         delBtn.style.display = 'block';
       } else {
         setEntryType('expense');
         document.getElementById('entryAmount').value = '';
         document.getElementById('entryNote').value = '';
-        document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('entryDate').value = getTodayISO();
         document.getElementById('entryRecurring').classList.remove('on');
-        populateEntryCategories();
         delBtn.style.display = 'none';
       }
 
-      modal.classList.add('open');
-      setTimeout(() => document.getElementById('entryAmount').focus(), 120);
+      document.getElementById('modal-entry').classList.add('open');
     }
 
     function setEntryType(t) {
       entryType = t;
       document.querySelectorAll('#modal-entry .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.etype === t));
-      populateEntryCategories();
-    }
-
-    function populateEntryCategories(selectedId = null) {
-      const sel = document.getElementById('entryCategory');
-      sel.innerHTML = '';
-      const targetType = entryType === 'income' ? 'income' : 'expense';
-      state.categories
-        .filter(c => c.type === targetType)
-        .forEach(c => {
-          const opt = document.createElement('option');
-          opt.value = c.id;
-          opt.textContent = c.parentId ? `↳ ${c.name}` : c.name;
-          if (selectedId === c.id) opt.selected = true;
-          sel.appendChild(opt);
-        });
+      const targetType = t === 'income' ? 'income' : 'expense';
+      const firstMatch = state.categories.find(c => c.type === targetType);
+      selectedEntryCatId = firstMatch ? firstMatch.id : null;
+      updateEntryCategoryDisplay();
     }
 
     function toggleSwitch(id) {
@@ -1614,15 +2250,22 @@
 
     function saveEntry() {
       const amount = parseFloat(document.getElementById('entryAmount').value);
-      if (!amount || amount <= 0) return;
+      if (!amount || amount <= 0) {
+        showToast('Bitte Betrag eingeben');
+        return;
+      }
+      if (!selectedEntryCatId) {
+        showToast('Bitte Kategorie wählen');
+        return;
+      }
 
       const data = {
         id: editingEntryId || 'e' + Date.now(),
         type: entryType,
         amount,
-        categoryId: document.getElementById('entryCategory').value,
+        categoryId: selectedEntryCatId,
         note: document.getElementById('entryNote').value.trim(),
-        date: document.getElementById('entryDate').value,
+        date: document.getElementById('entryDate').value || getTodayISO(),
         recurring: document.getElementById('entryRecurring').classList.contains('on')
       };
 
@@ -1631,12 +2274,12 @@
         state.entries[idx] = data;
       } else {
         state.entries.unshift(data);
-        state.loggedToday = true;
+        updateStreak();
       }
 
       closeModals();
       renderAll();
-      showToast('Eintrag gespeichert');
+      showToast('Buchung gespeichert');
     }
 
     function deleteEntry() {
@@ -1646,40 +2289,11 @@
       showToast('Gelöscht');
     }
 
-    // Category Modal
+    // Kategorie-Modal mit 18 Farben & sortierten Themen-Icons
     function openCategoryModal(id = null) {
       haptic();
       editingCatId = id;
       const delBtn = document.getElementById('deleteCatBtn');
-
-      const cGrid = document.getElementById('colorGrid');
-      cGrid.innerHTML = '';
-      COLORS.forEach(col => {
-        const d = document.createElement('div');
-        d.className = 'swatch' + (col === selectedColor ? ' selected' : '');
-        d.style.background = col;
-        d.onclick = () => { selectedColor = col; openCategoryModal(editingCatId); };
-        cGrid.appendChild(d);
-      });
-
-      const iGrid = document.getElementById('iconGrid');
-      iGrid.innerHTML = '';
-      Object.keys(ICONS).forEach(k => {
-        const d = document.createElement('div');
-        d.className = 'icon-choice' + (k === selectedIcon ? ' selected' : '');
-        d.innerHTML = ICONS[k];
-        d.onclick = () => { selectedIcon = k; openCategoryModal(editingCatId); };
-        iGrid.appendChild(d);
-      });
-
-      const parentSel = document.getElementById('catParent');
-      parentSel.innerHTML = '';
-      state.categories.filter(c => !c.parentId && c.id !== id).forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.id;
-        opt.textContent = p.name;
-        parentSel.appendChild(opt);
-      });
 
       if (id) {
         const cat = state.categories.find(x => x.id === id);
@@ -1687,19 +2301,56 @@
         setCatType(cat.type);
         selectedColor = cat.color;
         selectedIcon = cat.icon;
+        selectedParentCatId = cat.parentId;
         const isSub = !!cat.parentId;
         document.getElementById('catIsSub').classList.toggle('on', isSub);
         document.getElementById('parentCatField').style.display = isSub ? 'block' : 'none';
-        if (isSub) parentSel.value = cat.parentId;
+        updateParentCategoryDisplay();
         delBtn.style.display = 'block';
       } else {
         document.getElementById('catName').value = '';
+        setCatType('expense');
+        selectedParentCatId = null;
         document.getElementById('catIsSub').classList.remove('on');
         document.getElementById('parentCatField').style.display = 'none';
+        updateParentCategoryDisplay();
         delBtn.style.display = 'none';
       }
 
+      renderCategoryPickers();
       document.getElementById('modal-category').classList.add('open');
+    }
+
+    function renderCategoryPickers() {
+      const cGrid = document.getElementById('colorGrid');
+      cGrid.innerHTML = '';
+      COLORS.forEach(col => {
+        const d = document.createElement('div');
+        d.className = 'swatch' + (col === selectedColor ? ' selected' : '');
+        d.style.background = col;
+        d.onclick = () => { haptic(); selectedColor = col; renderCategoryPickers(); };
+        cGrid.appendChild(d);
+      });
+
+      const container = document.getElementById('iconGroupsContainer');
+      container.innerHTML = '';
+      Object.entries(ICON_GROUPS).forEach(([groupTitle, iconsObj]) => {
+        const titleEl = document.createElement('div');
+        titleEl.className = 'icon-group-title';
+        titleEl.textContent = groupTitle;
+        container.appendChild(titleEl);
+
+        const grid = document.createElement('div');
+        grid.className = 'icon-grid';
+        Object.entries(iconsObj).forEach(([key, svg]) => {
+          const btn = document.createElement('div');
+          btn.className = 'icon-choice' + (key === selectedIcon ? ' selected' : '');
+          btn.innerHTML = svg;
+          btn.onclick = () => { haptic(); selectedIcon = key; renderCategoryPickers(); };
+          grid.appendChild(btn);
+        });
+        container.appendChild(grid);
+      });
     }
 
     function setCatType(t) {
@@ -1724,7 +2375,7 @@
         type: catType,
         color: selectedColor,
         icon: selectedIcon,
-        parentId: isSub ? document.getElementById('catParent').value : null
+        parentId: isSub ? selectedParentCatId : null
       };
 
       if (editingCatId) {
@@ -1746,7 +2397,7 @@
       showToast('Gelöscht');
     }
 
-    // Investment Modal
+    // Investment-Modal
     function openInvestmentModal(id = null) {
       haptic();
       editingInvId = id;
@@ -1767,7 +2418,7 @@
         document.getElementById('invName').value = '';
         document.getElementById('invAmount').value = '';
         document.getElementById('invRate').value = '7.0';
-        document.getElementById('invDate').value = new Date().toISOString().split('T')[0];
+        document.getElementById('invDate').value = getTodayISO();
         document.getElementById('invRecurring').classList.remove('on');
         document.getElementById('invHasFee').classList.remove('on');
         delBtn.style.display = 'none';
@@ -1796,7 +2447,7 @@
     }
 
     function saveInvestment() {
-      const name = document.getElementById('invName').value.trim() || 'Investment';
+      const name = document.getElementById('invName').value.trim() || 'Portfolio';
       const amount = parseFloat(document.getElementById('invAmount').value);
       if (!amount || amount <= 0) return;
 
@@ -1808,7 +2459,7 @@
         name,
         amount,
         rate: parseFloat(document.getElementById('invRate').value) || 0,
-        date: document.getElementById('invDate').value,
+        date: document.getElementById('invDate').value || getTodayISO(),
         recurring: isRec,
         dyn: isRec ? (parseFloat(document.getElementById('invDyn').value) || 0) : 0,
         fee: hasFee ? (parseFloat(document.getElementById('invFee').value) || 0) : 0
@@ -1833,7 +2484,61 @@
       showToast('Gelöscht');
     }
 
-    // Theme, Onboarding & Paywall
+    // Tägliche Handy-Benachrichtigung statt nervigem Banner
+    async function toggleDailyNotification() {
+      const sw = document.getElementById('notifSwitch');
+      const next = !sw.classList.contains('on');
+
+      if (next && 'Notification' in window) {
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted') {
+          showToast('Bitte Benachrichtigungen im System erlauben');
+          return;
+        }
+      }
+
+      state.notifEnabled = next;
+      sw.classList.toggle('on', next);
+      document.getElementById('notifTimeField').style.display = next ? 'block' : 'none';
+      saveState();
+      if (next) showToast(`Tägliche Erinnerung um ${state.notifTime} Uhr aktiv`);
+    }
+
+    function saveNotificationTime() {
+      state.notifTime = document.getElementById('notifTimeInput').value || '20:00';
+      saveState();
+      showToast(`Erinnerung auf ${state.notifTime} Uhr gestellt`);
+    }
+
+    function checkDailyNotificationTrigger() {
+      if (!state.notifEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
+      const now = new Date();
+      const today = getTodayISO();
+      const currentHM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      if (currentHM >= state.notifTime && state.lastNotifDate !== today) {
+        state.lastNotifDate = today;
+        saveState();
+        if (navigator.serviceWorker && navigator.serviceWorker.ready) {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.showNotification('FinanzOS', {
+              body: 'Zeit für deinen kurzen Tagesabschluss.',
+              silent: false
+            });
+          });
+        }
+      }
+    }
+
+    setInterval(checkDailyNotificationTrigger, 45000);
+
+    function updateStreak() {
+      const today = getTodayISO();
+      if (state.lastActiveDate !== today) {
+        state.streak = (state.streak || 1) + 1;
+        state.lastActiveDate = today;
+      }
+    }
+
     function toggleTheme() {
       const html = document.documentElement;
       const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -1841,30 +2546,12 @@
       document.getElementById('themeSwitch').classList.toggle('on', next === 'dark');
     }
 
-    function handleProChartClick() {
-      if (!state.isPro) openPaywall();
-    }
-
-    function openPaywall() {
-      closeModals();
-      document.getElementById('modal-paywall').classList.add('open');
-    }
-
-    function activatePro() {
-      state.isPro = true;
-      document.getElementById('settingsProStatus').textContent = 'Aktiv';
-      closeModals();
-      renderAll();
-      showToast('Pro-Testphase aktiviert');
-    }
-
     function exportCSV() {
-      if (!state.isPro) {
-        openPaywall();
-        return;
-      }
-      const rows = [['Datum','Typ','Betrag','Notiz']];
-      state.entries.forEach(e => rows.push([e.date, e.type, e.amount, e.note]));
+      const rows = [['Datum','Typ','Betrag','Kategorie','Notiz']];
+      state.entries.forEach(e => {
+        const c = state.categories.find(x => x.id === e.categoryId)?.name || '';
+        rows.push([e.date, e.type, e.amount, c, e.note || '']);
+      });
       const csv = rows.map(r => r.join(';')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });
       const a = document.createElement('a');
@@ -1874,50 +2561,82 @@
       showToast('CSV exportiert');
     }
 
-    const ONBOARD_SLIDES = [
-      {
-        title: 'Klarheit auf einen Blick.',
-        sub: 'Dein tatsächliches Vermögen strikt getrennt von Leihen und Investments.',
-        icon: '<svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg>'
-      },
-      {
-        title: 'Mathematischer Zinseszins.',
-        sub: 'Simuliere Daueraufträge, Ratensteigerungen und Rendite ganz ohne Bank-Zwang.',
-        icon: '<svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>'
-      },
-      {
-        title: 'Bereit für deinen Start.',
-        sub: 'Sichere deine Struktur mit einem Klick oder starte direkt lokal auf deinem Gerät.',
-        icon: '<svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
-      }
-    ];
+    function resetAllData() {
+      localStorage.removeItem('finanzos_v4');
+      location.reload();
+    }
 
+    // Visuelle Einführungsreise (Langsam & Interaktiv zum Selbst-Einrichten)
     function renderOnboarding() {
-      const s = ONBOARD_SLIDES[onboardStep];
-      document.getElementById('onboardSlideContainer').innerHTML = `
-        <div class="onboard-graphic">${s.icon}</div>
-        <div class="onboard-title">${s.title}</div>
-        <div class="onboard-sub">${s.sub}</div>
-      `;
-
+      const stage = document.getElementById('onboardStage');
       const dots = document.getElementById('onboardDots');
+      const act = document.getElementById('onboardActions');
+
       dots.innerHTML = '';
-      ONBOARD_SLIDES.forEach((_, idx) => {
+      [0, 1, 2].forEach(idx => {
         const d = document.createElement('div');
         d.className = 'dot' + (idx === onboardStep ? ' active' : '');
         dots.appendChild(d);
       });
 
-      const act = document.getElementById('onboardActions');
-      if (onboardStep < 2) {
-        act.innerHTML = `<button class="primary-btn" onclick="nextOnboard()">Weiter</button>`;
-      } else {
-        act.innerHTML = `
-          <button class="auth-btn" onclick="finishOnboarding('Apple')">Mit Apple fortfahren</button>
-          <button class="auth-btn" onclick="finishOnboarding('Google')">Mit Google fortfahren</button>
-          <button class="primary-btn" onclick="finishOnboarding('Lokal')">Direkt starten</button>
+      if (onboardStep === 0) {
+        stage.innerHTML = `
+          <div class="journey-orb">${ICONS.trend}</div>
+          <h2 style="font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:10px">Willkommen bei FinanzOS.</h2>
+          <p style="font-size:14px;color:var(--muted);line-height:1.6;max-width:290px">
+            Eine ruhige, mathematisch präzise Umgebung für dein Vermögen, deine Ausgaben und deine Investments.
+          </p>
         `;
+        act.innerHTML = `<button class="primary-btn" onclick="nextOnboard()">Reise starten</button>`;
+      } else if (onboardStep === 1) {
+        stage.innerHTML = `
+          <div class="journey-orb">${ICONS.home}</div>
+          <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Wähle deine Grundstruktur.</h2>
+          <p style="font-size:13px;color:var(--muted);max-width:290px">
+            Tippe die Kategorien an, mit denen du starten möchtest. Du kannst sie jederzeit frei erweitern.
+          </p>
+          <div class="chip-grid">
+            ${STARTER_PRESETS.map(p => `
+              <div class="Preset-chip ${selectedStarterKeys.includes(p.key) ? 'selected' : ''}" onclick="toggleStarterPreset('${p.key}')">
+                <span style="color:${p.color};display:flex">${ICONS[p.icon]}</span>
+                <span>${p.name}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        act.innerHTML = `<button class="primary-btn" onclick="nextOnboard()">Weiter</button>`;
+      } else if (onboardStep === 2) {
+        stage.innerHTML = `
+          <div class="journey-orb">${ICONS.wallet}</div>
+          <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Startbestand & Erinnerung</h2>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px;max-width:290px">
+            Trage optional deinen aktuellen Kontostand ein oder starte direkt bei 0,00 €.
+          </p>
+          <div style="width:100%;max-width:280px">
+            <input id="onboardInitialBalance" type="number" step="0.01" placeholder="0,00 € Startbetrag (optional)" class="input" style="text-align:center;margin-bottom:12px" />
+            <div class="toggle-row" onclick="toggleOnboardNotif()">
+              <span style="font-size:13px">Tägliche Handy-Erinnerung</span>
+              <div id="onboardNotifSwitch" class="switch ${state.notifEnabled ? 'on' : ''}"></div>
+            </div>
+          </div>
+        `;
+        act.innerHTML = `<button class="primary-btn" onclick="finishOnboarding()">FinanzOS öffnen</button>`;
       }
+    }
+
+    function toggleStarterPreset(key) {
+      haptic();
+      if (selectedStarterKeys.includes(key)) {
+        selectedStarterKeys = selectedStarterKeys.filter(k => k !== key);
+      } else {
+        selectedStarterKeys.push(key);
+      }
+      renderOnboarding();
+    }
+
+    async function toggleOnboardNotif() {
+      await toggleDailyNotification();
+      renderOnboarding();
     }
 
     function nextOnboard() {
@@ -1927,10 +2646,45 @@
     }
 
     function finishOnboarding() {
+      haptic();
+      if (state.categories.length === 0) {
+        selectedStarterKeys.forEach((key, idx) => {
+          const p = STARTER_PRESETS.find(x => x.key === key);
+          if (p) {
+            state.categories.push({
+              id: 'c_init_' + idx,
+              name: p.name,
+              type: p.type,
+              color: p.color,
+              icon: p.icon,
+              parentId: null
+            });
+          }
+        });
+      }
+
+      const initBal = parseFloat(document.getElementById('onboardInitialBalance')?.value);
+      if (initBal && initBal > 0) {
+        let incCat = state.categories.find(c => c.type === 'income');
+        if (!incCat) {
+          incCat = { id: 'c_start_inc', name: 'Startbestand', type: 'income', color: '#00D09C', icon: 'wallet', parentId: null };
+          state.categories.push(incCat);
+        }
+        state.entries.push({
+          id: 'e_init',
+          type: 'income',
+          amount: initBal,
+          categoryId: incCat.id,
+          note: 'Startbestand',
+          date: getTodayISO(),
+          recurring: false
+        });
+      }
+
       state.onboarded = true;
       closeModals();
       renderAll();
-      showToast('Willkommen bei FinanzOS');
+      showToast('Bereit');
     }
 
     function replayOnboarding() {
@@ -1940,13 +2694,11 @@
       document.getElementById('modal-onboarding').classList.add('open');
     }
 
-    // Init
     if (!state.onboarded) {
       replayOnboarding();
     }
     renderAll();
-  </script>
-  <script>
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js');
     }
