@@ -3,13 +3,14 @@
   "short_name": "FinanzOS",
   "start_url": "./index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#0B0E14",
   "theme_color": "#0B0E14",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/5501/5501375.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='115' fill='%230B0E14'/%3E%3Ccircle cx='256' cy='256' r='140' fill='none' stroke='%231F2637' stroke-width='36'/%3E%3Ccircle cx='256' cy='256' r='140' fill='none' stroke='%2300D09C' stroke-width='36' stroke-dasharray='620 880' stroke-linecap='round' transform='rotate(-90 256 256)'/%3E%3C/svg%3E",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]
