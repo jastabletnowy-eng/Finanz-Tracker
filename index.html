@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>FinanzOS</title>
+  <title>Cashview - Haushaltsbuch</title>
 
-  <!-- Saubere PWA-Verknüpfung -->
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0B0E14" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -42,7 +41,6 @@
       --ambient-glow: radial-gradient(circle at 50% 0%, rgba(0, 179, 134, 0.08) 0%, transparent 68%);
     }
 
-    /* Atmosphärische Filter-Stimmungen auf der Startseite */
     .app-shell[data-mood="income"] {
       --accent: #00E6A8;
       --accent-dim: rgba(0, 230, 168, 0.18);
@@ -64,7 +62,6 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
     }
 
-    /* Verhindert Pull-to-Refresh und Layout-Dehnung auf Android/iOS */
     html, body {
       position: fixed;
       inset: 0;
@@ -102,12 +99,6 @@
       pointer-events: none;
       z-index: 0;
       transition: background 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-      animation: ambientPulse 7s ease-in-out infinite alternate;
-    }
-
-    @keyframes ambientPulse {
-      0% { opacity: 0.75; transform: scale(1); }
-      100% { opacity: 1; transform: scale(1.06); }
     }
 
     @media (max-width: 460px) {
@@ -117,6 +108,44 @@
         border-radius: 0;
         border: none;
       }
+    }
+
+    /* Start Logo Intro Screen */
+    .intro-splash {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+    .intro-splash.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .intro-logo-ring {
+      width: 76px;
+      height: 76px;
+      border-radius: 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      box-shadow: 0 0 35px rgba(0, 208, 156, 0.25);
+      animation: logoPulse 1.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes logoPulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 20px rgba(0, 208, 156, 0.15); }
+      100% { transform: scale(1.05); box-shadow: 0 0 45px rgba(0, 208, 156, 0.35); }
     }
 
     /* Top Header */
@@ -147,7 +176,6 @@
       min-height: 34px;
     }
 
-    /* Streak Counter */
     .streak-pill {
       display: inline-flex;
       align-items: center;
@@ -161,14 +189,13 @@
       color: var(--text);
       cursor: pointer;
       width: fit-content;
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .streak-pill:active {
       transform: scale(0.92);
     }
 
-    /* Period Navigation */
     .period-nav {
       display: flex;
       align-items: center;
@@ -212,7 +239,6 @@
       background: var(--accent-dim);
     }
 
-    /* Granularity Pills (Tag, Woche, Monat, Zeitraum) */
     .granularity-bar {
       display: inline-flex;
       background: var(--card);
@@ -239,7 +265,7 @@
       color: var(--accent);
     }
 
-    /* Main Screens */
+    /* Screens */
     .screen {
       position: relative;
       z-index: 5;
@@ -266,7 +292,6 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Fullscreen Modals */
     .fullscreen-modal {
       position: absolute;
       inset: 0;
@@ -289,7 +314,6 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
-    /* Custom Bottom-Sheet Picker (für Kategorien-Auswahl) */
     .sheet-backdrop {
       position: absolute;
       inset: 0;
@@ -298,7 +322,6 @@
       z-index: 80;
       display: none;
       align-items: flex-end;
-      animation: fadeSlow 0.45s ease;
     }
 
     .sheet-backdrop.open {
@@ -313,20 +336,8 @@
       border-radius: 26px 26px 0 0;
       padding: 18px 20px 28px;
       overflow-y: auto;
-      animation: sheetUp 0.55s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes sheetUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-
-    @keyframes fadeSlow {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    /* Hero Block & Donut */
     .hero-block {
       text-align: center;
       margin: 6px 0 12px;
@@ -338,14 +349,12 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       margin-bottom: 4px;
-      transition: color 0.5s ease;
     }
 
     .hero-amount {
       font-size: 34px;
       font-weight: 700;
       letter-spacing: -1px;
-      transition: color 0.5s ease, transform 0.5s ease;
     }
 
     .donut-wrap {
@@ -359,10 +368,9 @@
     }
 
     .donut-segment {
-      transition: stroke-dasharray 0.85s cubic-bezier(0.22, 1, 0.36, 1), stroke-dashoffset 0.85s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.6s ease;
+      transition: stroke-dasharray 0.85s cubic-bezier(0.22, 1, 0.36, 1), stroke-dashoffset 0.85s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    /* Filter Dropdown (direkt unter dem Filter-Icon rechts) */
     .filter-pop {
       position: absolute;
       top: 98px;
@@ -375,7 +383,6 @@
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
       display: none;
       z-index: 40;
-      animation: fadeSlow 0.35s ease;
     }
 
     .filter-pop.open {
@@ -392,7 +399,6 @@
       align-items: center;
       justify-content: space-between;
       color: var(--text);
-      transition: background 0.3s ease, color 0.3s ease;
     }
 
     .filter-opt.selected {
@@ -401,7 +407,6 @@
       font-weight: 600;
     }
 
-    /* Lists */
     .list-group {
       display: flex;
       flex-direction: column;
@@ -417,12 +422,18 @@
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      transition: background 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease;
+      transition: background 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .list-item:active {
       transform: scale(0.975);
       background: var(--card-hover);
+    }
+
+    /* Ausgegraute Zukunftsbuchungen */
+    .list-item.future-pending {
+      opacity: 0.46;
+      border-style: dashed;
     }
 
     .item-left {
@@ -461,10 +472,7 @@
 
     .pos { color: #00D09C; }
     .neg { color: var(--text); }
-
-    .sub-indent {
-      margin-left: 22px;
-    }
+    .sub-indent { margin-left: 22px; }
 
     .empty-hint {
       text-align: center;
@@ -487,16 +495,8 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.4s ease;
     }
 
-    .add-row-btn:active {
-      border-color: var(--accent);
-      color: var(--accent);
-      transform: scale(0.98);
-    }
-
-    /* Exakt zentrierte 5-Spalten Reiterleiste unten */
     .bottom-nav {
       position: absolute;
       bottom: 0;
@@ -527,12 +527,9 @@
       font-weight: 500;
       cursor: pointer;
       padding: 6px 0;
-      transition: color 0.4s ease, transform 0.35s ease;
     }
 
-    .nav-btn.active {
-      color: var(--accent);
-    }
+    .nav-btn.active { color: var(--accent); }
 
     .nav-plus {
       width: 48px;
@@ -546,14 +543,8 @@
       justify-content: center;
       cursor: pointer;
       box-shadow: 0 6px 22px rgba(0, 208, 156, 0.35);
-      transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), background 0.5s ease;
     }
 
-    .nav-plus:active {
-      transform: scale(0.88);
-    }
-
-    /* Form Controls */
     .modal-header {
       display: flex;
       align-items: center;
@@ -561,10 +552,7 @@
       margin-bottom: 20px;
     }
 
-    .modal-title {
-      font-size: 17px;
-      font-weight: 600;
-    }
+    .modal-title { font-size: 17px; font-weight: 600; }
 
     .seg-control {
       display: grid;
@@ -576,9 +564,7 @@
       margin-bottom: 18px;
     }
 
-    .seg-control.two {
-      grid-template-columns: repeat(2, 1fr);
-    }
+    .seg-control.two { grid-template-columns: repeat(2, 1fr); }
 
     .seg-btn {
       padding: 9px;
@@ -588,24 +574,12 @@
       border-radius: 9px;
       color: var(--muted);
       cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .seg-btn.active {
-      background: var(--accent);
-      color: #06130E;
-    }
+    .seg-btn.active { background: var(--accent); color: #06130E; }
 
-    .field {
-      margin-bottom: 14px;
-    }
-
-    .field-label {
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-      display: block;
-    }
+    .field { margin-bottom: 14px; }
+    .field-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; display: block; }
 
     .input {
       width: 100%;
@@ -616,22 +590,10 @@
       border-radius: 13px;
       font-size: 15px;
       outline: none;
-      transition: border-color 0.35s ease;
     }
 
-    .input:focus {
-      border-color: var(--accent);
-    }
+    .input-amount { font-size: 28px; font-weight: 700; text-align: center; padding: 16px; }
 
-    .input-amount {
-      font-size: 28px;
-      font-weight: 700;
-      text-align: center;
-      padding: 16px;
-      letter-spacing: -0.5px;
-    }
-
-    /* Custom Designed Picker Trigger */
     .picker-trigger {
       width: 100%;
       background: var(--card);
@@ -642,11 +604,6 @@
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      transition: border-color 0.35s ease, background 0.35s ease;
-    }
-
-    .picker-trigger:active {
-      background: var(--card-hover);
     }
 
     .toggle-row {
@@ -684,13 +641,8 @@
       transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    .switch.on {
-      background: var(--accent);
-    }
-
-    .switch.on::after {
-      transform: translateX(20px);
-    }
+    .switch.on { background: var(--accent); }
+    .switch.on::after { transform: translateX(20px); }
 
     .primary-btn {
       width: 100%;
@@ -703,11 +655,6 @@
       font-weight: 700;
       cursor: pointer;
       margin-top: 8px;
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
-    }
-
-    .primary-btn:active {
-      transform: scale(0.97);
     }
 
     .delete-btn {
@@ -724,44 +671,29 @@
       display: none;
     }
 
-    /* Große Farb- und Icon-Auswahl */
+    /* 50 Farben Grid */
     .swatch-grid {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 6px;
     }
 
     .swatch {
-      width: 34px;
-      height: 34px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid transparent;
       margin: 0 auto;
-      transition: transform 0.35s ease, border-color 0.35s ease;
     }
 
-    .swatch.selected {
-      border-color: var(--text);
-      transform: scale(1.16);
-    }
+    .swatch.selected { border-color: var(--text); transform: scale(1.18); }
 
-    .icon-group-title {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin: 12px 0 6px;
-    }
-
-    .icon-grid {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 8px;
-    }
+    .icon-group-title { font-size: 11px; color: var(--muted); text-transform: uppercase; margin: 12px 0 6px; }
+    .icon-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
 
     .icon-choice {
-      height: 42px;
+      height: 40px;
       border-radius: 11px;
       background: var(--card);
       border: 1px solid var(--border);
@@ -770,267 +702,90 @@
       justify-content: center;
       color: var(--muted);
       cursor: pointer;
-      transition: all 0.35s ease;
     }
 
-    .icon-choice.selected {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-dim);
-      transform: scale(1.06);
-    }
+    .icon-choice.selected { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
 
-    /* Auswertung (Aussagekräftige Karten & Balken) */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 14px;
-    }
+    .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+    .kpi-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 14px; }
+    .kpi-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .kpi-val { font-size: 18px; font-weight: 700; }
 
-    .kpi-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 14px;
-    }
+    .chart-card { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 16px; margin-bottom: 14px; }
+    .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 13px; font-weight: 600; }
+    .bar-row { display: flex; align-items: flex-end; justify-content: space-between; height: 130px; gap: 8px; padding-top: 12px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+    .bar-pair { display: flex; align-items: flex-end; gap: 3px; height: 100%; width: 100%; justify-content: center; }
+    .bar { width: 10px; border-radius: 4px; }
+    .bar-lbl { font-size: 10px; color: var(--muted); }
+    .bar-val-top { font-size: 9px; color: var(--muted); }
 
-    .kpi-label {
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 4px;
-    }
+    .cat-breakdown-row { margin-bottom: 12px; }
+    .cat-breakdown-head { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+    .progress-track { width: 100%; height: 7px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 99px; }
 
-    .kpi-val {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .chart-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 14px;
-    }
-
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .bar-row {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      height: 130px;
-      gap: 8px;
-      padding-top: 12px;
-    }
-
-    .bar-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      height: 100%;
-      justify-content: flex-end;
-    }
-
-    .bar-pair {
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      height: 100%;
-      width: 100%;
-      justify-content: center;
-    }
-
-    .bar {
-      width: 10px;
-      border-radius: 4px;
-      transition: height 0.75s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .bar-lbl {
-      font-size: 10px;
-      color: var(--muted);
-    }
-
-    .bar-val-top {
-      font-size: 9px;
-      color: var(--muted);
-    }
-
-    .cat-breakdown-row {
-      margin-bottom: 12px;
-    }
-
-    .cat-breakdown-head {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      margin-bottom: 5px;
-    }
-
-    .progress-track {
-      width: 100%;
-      height: 7px;
-      background: var(--border);
-      border-radius: 99px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      border-radius: 99px;
-      transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    /* Onboarding Journey (Langsame, atmosphärische Reise) */
-    .journey-stage {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 10px;
-      animation: journeyFade 1.1s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    @keyframes journeyFade {
-      from { opacity: 0; transform: translateY(22px) scale(0.96); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
+    .journey-stage { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 10px; }
     .journey-orb {
-      width: 118px;
-      height: 118px;
-      border-radius: 36px;
-      background: var(--accent-dim);
-      border: 1px solid rgba(0, 208, 156, 0.35);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent);
-      margin-bottom: 24px;
-      box-shadow: 0 0 50px rgba(0, 208, 156, 0.2);
-      animation: orbFloat 4s ease-in-out infinite alternate;
+      width: 118px; height: 118px; border-radius: 36px; background: var(--accent-dim);
+      border: 1px solid rgba(0, 208, 156, 0.35); display: flex; align-items: center; justify-content: center;
+      color: var(--accent); margin-bottom: 24px; box-shadow: 0 0 50px rgba(0, 208, 156, 0.2);
     }
-
-    @keyframes orbFloat {
-      from { transform: translateY(-4px); }
-      to { transform: translateY(6px); }
-    }
-
-    .chip-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      margin-top: 16px;
-    }
-
+    .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
     .Preset-chip {
-      padding: 9px 14px;
-      border-radius: 99px;
-      border: 1px solid var(--border);
-      background: var(--card);
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.45s ease;
+      padding: 9px 14px; border-radius: 99px; border: 1px solid var(--border); background: var(--card);
+      color: var(--muted); font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px;
     }
-
-    .Preset-chip.selected {
-      border-color: var(--accent);
-      background: var(--accent-dim);
-      color: var(--text);
-    }
-
-    .dots {
-      display: flex;
-      gap: 6px;
-      justify-content: center;
-      margin: 16px 0;
-    }
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 99px;
-      background: var(--border);
-      transition: all 0.55s ease;
-    }
-
-    .dot.active {
-      width: 22px;
-      background: var(--accent);
-    }
+    .Preset-chip.selected { border-color: var(--accent); background: var(--accent-dim); color: var(--text); }
+    .dots { display: flex; gap: 6px; justify-content: center; margin: 16px 0; }
+    .dot { width: 6px; height: 6px; border-radius: 99px; background: var(--border); transition: all 0.55s ease; }
+    .dot.active { width: 22px; background: var(--accent); }
 
     .toast {
-      position: absolute;
-      top: 18px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-80px);
-      background: var(--accent);
-      color: #06130E;
-      padding: 8px 16px;
-      border-radius: 99px;
-      font-size: 12px;
-      font-weight: 700;
-      z-index: 120;
+      position: absolute; top: 18px; left: 50%; transform: translateX(-50%) translateY(-80px);
+      background: var(--accent); color: #06130E; padding: 8px 16px; border-radius: 99px; font-size: 12px; font-weight: 700; z-index: 120;
       transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
-
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
+  <!-- Start Logo Intro Screen -->
+  <div id="introSplash" class="intro-splash">
+    <div class="intro-logo-ring">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg>
+    </div>
+    <div style="font-size:16px;font-weight:700;letter-spacing:-0.3px">Cashview</div>
+  </div>
+
   <div id="appShell" class="app-shell" data-mood="neutral">
     <div class="ambient-layer"></div>
-    <div id="toast" class="toast">Gespeichert</div>
+    <div id="toast" class="toast">Saved</div>
 
-    <!-- TOP HEADER (Zahnrad auf jeder Seite oben rechts, Filter darunter auf Start) -->
+    <!-- TOP HEADER -->
     <div class="topbar">
       <div class="topbar-main">
-        <!-- Links: Streak Counter -->
-        <div class="streak-pill" onclick="showToast(state.streak + ' Tage Fokus-Serie')">
+        <div class="streak-pill" onclick="showToast(state.streak + ' Days Streak')">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="9" stroke="var(--border)" stroke-width="2.5"/>
             <circle cx="12" cy="12" r="9" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="56" stroke-dashoffset="14" stroke-linecap="round"/>
           </svg>
-          <span id="streakCount">1T</span>
+          <span id="streakCount">1D</span>
         </div>
 
-        <!-- Mitte: Zeitnavigation (Start/Investments/Auswertung) ODER Titel (Kategorien) -->
         <div id="periodNavWrap" class="period-nav">
           <button class="icon-btn" style="width:28px;height:28px" onclick="shiftPeriod(-1)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
-          <span id="periodLabel" onclick="openCustomRangeIfNeeded()" style="cursor:pointer">Oktober 2026</span>
+          <span id="periodLabel" onclick="openCustomRangeIfNeeded()" style="cursor:pointer">October 2026</span>
           <button class="icon-btn" style="width:28px;height:28px" onclick="shiftPeriod(1)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
         </div>
-        <div id="staticHeaderTitle" class="screen-header-title" style="display:none">Kategorien</div>
+        <div id="staticHeaderTitle" class="screen-header-title" style="display:none">Categories</div>
 
-        <!-- Rechts: Einstellungen-Zahnrad (Auf JEDER Seite) -->
         <div class="topbar-right">
-          <button class="icon-btn" onclick="openSettings()" title="Einstellungen">
+          <button class="icon-btn" onclick="openSettings()" title="Settings">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="3"/>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -1039,13 +794,12 @@
         </div>
       </div>
 
-      <!-- Zweite Zeile (Nur auf Startseite sichtbar: Zeitraum-Körnung links, Filter-Icon rechts unter Zahnrad) -->
       <div id="homeSubBar" class="topbar-sub">
         <div class="granularity-bar">
-          <button class="gran-btn" data-gran="day" onclick="setGranularity('day')">Tag</button>
-          <button class="gran-btn" data-gran="week" onclick="setGranularity('week')">Woche</button>
-          <button class="gran-btn active" data-gran="month" onclick="setGranularity('month')">Monat</button>
-          <button class="gran-btn" data-gran="range" onclick="setGranularity('range')">Zeitraum</button>
+          <button class="gran-btn" data-gran="day" onclick="setGranularity('day')">Day</button>
+          <button class="gran-btn" data-gran="week" onclick="setGranularity('week')">Week</button>
+          <button class="gran-btn active" data-gran="month" onclick="setGranularity('month')">Month</button>
+          <button class="gran-btn" data-gran="range" onclick="setGranularity('range')">Range</button>
         </div>
 
         <button id="filterBtn" class="icon-btn" onclick="toggleFilterPop()" title="Filter">
@@ -1056,21 +810,21 @@
       </div>
     </div>
 
-    <!-- Filter Popover (Startseite unter dem Filter-Icon) -->
+    <!-- Filter Popover -->
     <div id="filterPop" class="filter-pop">
-      <div class="filter-opt selected" data-filter="actual" onclick="setFilter('actual')">Vermögen</div>
-      <div class="filter-opt" data-filter="income" onclick="setFilter('income')">Einnahmen</div>
-      <div class="filter-opt" data-filter="expense" onclick="setFilter('expense')">Ausgaben</div>
-      <div class="filter-opt" data-filter="loans" onclick="setFilter('loans')">Inkl. Leihen</div>
-      <div class="filter-opt" data-filter="invest" onclick="setFilter('invest')">Investitionen</div>
-      <div class="filter-opt" data-filter="all" onclick="setFilter('all')">Gesamt</div>
+      <div class="filter-opt selected" data-filter="actual" onclick="setFilter('actual')">Net Worth</div>
+      <div class="filter-opt" data-filter="income" onclick="setFilter('income')">Income</div>
+      <div class="filter-opt" data-filter="expense" onclick="setFilter('expense')">Expenses</div>
+      <div class="filter-opt" data-filter="loans" onclick="setFilter('loans')">Incl. Loans</div>
+      <div class="filter-opt" data-filter="invest" onclick="setFilter('invest')">Investments</div>
+      <div class="filter-opt" data-filter="all" onclick="setFilter('all')">Total</div>
     </div>
 
-    <!-- 1. STARTSEITE -->
+    <!-- 1. HOME -->
     <div id="screen-home" class="screen active">
       <div class="hero-block">
-        <div id="filterTitle" class="hero-label">Vermögen</div>
-        <div id="homeTotal" class="hero-amount">0,00 €</div>
+        <div id="filterTitle" class="hero-label">Net Worth</div>
+        <div id="homeTotal" class="hero-amount">0.00 €</div>
       </div>
 
       <div class="donut-wrap">
@@ -1080,7 +834,7 @@
       <div id="homeList" class="list-group"></div>
     </div>
 
-    <!-- 2. KATEGORIEN -->
+    <!-- 2. CATEGORIES -->
     <div id="screen-categories" class="screen">
       <div id="catList" class="list-group"></div>
       <button class="add-row-btn" onclick="openCategoryModal()">
@@ -1091,9 +845,10 @@
     <!-- 3. INVESTMENTS -->
     <div id="screen-investments" class="screen">
       <div class="hero-block">
-        <div class="hero-label">Portfolio</div>
-        <div id="invTotal" class="hero-amount">0,00 €</div>
-        <div id="invGain" style="font-size:13px;font-weight:600;color:var(--accent);margin-top:4px;">+0,00 € (0,0%)</div>
+        <div class="hero-label">Portfolio Value</div>
+        <div id="invTotal" class="hero-amount">0.00 €</div>
+        <div id="invDailyEarn" style="font-size:12px;font-weight:600;color:var(--accent);margin-top:4px;">+0.00 € today</div>
+        <div id="invGain" style="font-size:12px;color:var(--muted);margin-top:2px;">Total +0.00 € (0.0%)</div>
       </div>
 
       <div id="invList" class="list-group"></div>
@@ -1102,30 +857,30 @@
       </button>
     </div>
 
-    <!-- 4. AUSWERTUNG (Konkret & Informativ) -->
+    <!-- 4. ANALYTICS -->
     <div id="screen-analytics" class="screen">
       <div class="kpi-grid">
         <div class="kpi-card">
-          <div class="kpi-label">Sparquote</div>
+          <div class="kpi-label">Savings Rate</div>
           <div id="kpiSavingsRate" class="kpi-val" style="color:var(--accent)">0%</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Netto-Cashflow</div>
-          <div id="kpiNetCashflow" class="kpi-val">0,00 €</div>
+          <div class="kpi-label">Net Cashflow</div>
+          <div id="kpiNetCashflow" class="kpi-val">0.00 €</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Ø pro Tag (Ausgaben)</div>
-          <div id="kpiDailyBurn" class="kpi-val">0,00 €</div>
+          <div class="kpi-label">Daily Burn Rate</div>
+          <div id="kpiDailyBurn" class="kpi-val">0.00 €</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Top-Kategorie</div>
+          <div class="kpi-label">Top Category</div>
           <div id="kpiTopCat" class="kpi-val" style="font-size:15px">–</div>
         </div>
       </div>
 
       <div class="chart-card">
         <div class="chart-header">
-          <span>Einnahmen vs. Ausgaben (6M)</span>
+          <span>Income vs. Expenses</span>
           <span id="cashflowSummaryLabel" style="color:var(--muted);font-size:11px"></span>
         </div>
         <div id="cashflowBars" class="bar-row"></div>
@@ -1133,99 +888,89 @@
 
       <div class="chart-card">
         <div class="chart-header">
-          <span>Ausgaben nach Kategorie</span>
-          <span style="color:var(--muted);font-size:11px">Anteil</span>
+          <span>Expenses by Category</span>
         </div>
         <div id="analyticsCatBreakdown"></div>
       </div>
-
-      <div class="chart-card">
-        <div class="chart-header">
-          <span>Investment-Projektion (Zinseszins)</span>
-          <span id="projRateHint" style="color:var(--accent);font-size:11px"></span>
-        </div>
-        <div id="wealthBars" class="bar-row"></div>
-      </div>
     </div>
 
-    <!-- EXAKT ZENTRIERTE 5-SPALTEN REITERLEISTE -->
+    <!-- BOTTOM NAV -->
     <div class="bottom-nav">
       <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg>
-        <span>Start</span>
+        <span id="lblNavHome">Home</span>
       </button>
       <button class="nav-btn" data-tab="categories" onclick="switchTab('categories')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
-        <span>Kategorien</span>
+        <span id="lblNavCat">Categories</span>
       </button>
       <button class="nav-plus" onclick="openEntryModal()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
       </button>
       <button class="nav-btn" data-tab="investments" onclick="switchTab('investments')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-        <span>Investments</span>
+        <span id="lblNavInv">Invest</span>
       </button>
       <button class="nav-btn" data-tab="analytics" onclick="switchTab('analytics')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        <span>Auswertung</span>
+        <span id="lblNavAna">Analytics</span>
       </button>
     </div>
 
-    <!-- MODAL: EINTRAG (+ / BEARBEITEN) -->
+    <!-- MODAL: ENTRY -->
     <div id="modal-entry" class="fullscreen-modal">
       <div class="modal-header">
-        <span class="modal-title">Buchung</span>
+        <span class="modal-title">Transaction</span>
         <button class="icon-btn" onclick="closeModals()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
 
       <div class="seg-control">
-        <div class="seg-btn active" data-etype="expense" onclick="setEntryType('expense')">Ausgabe</div>
-        <div class="seg-btn" data-etype="income" onclick="setEntryType('income')">Einnahme</div>
-        <div class="seg-btn" data-etype="loan" onclick="setEntryType('loan')">Leihe</div>
+        <div class="seg-btn active" data-etype="expense" onclick="setEntryType('expense')">Expense</div>
+        <div class="seg-btn" data-etype="income" onclick="setEntryType('income')">Income</div>
+        <div class="seg-btn" data-etype="loan" onclick="setEntryType('loan')">Loan</div>
       </div>
 
       <div class="field">
-        <input id="entryAmount" type="number" step="0.01" placeholder="0,00" class="input input-amount" />
+        <input id="entryAmount" type="number" step="0.01" placeholder="0.00" class="input input-amount" />
       </div>
 
-      <!-- Custom Kategorie-Auswahl (ersetzt das hässliche Standard-Select) -->
       <div class="field">
-        <label class="field-label">Kategorie</label>
+        <label class="field-label">Category</label>
         <div class="picker-trigger" onclick="openCategorySheet('entry')">
           <div class="item-left" id="entryCategoryDisplay">
             <div class="cat-icon" style="width:28px;height:28px;background:var(--border)"></div>
-            <span style="font-size:14px;font-weight:600">Kategorie wählen</span>
+            <span style="font-size:14px;font-weight:600">Select category</span>
           </div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
       </div>
 
       <div class="field">
-        <label class="field-label">Bezeichnung (optional)</label>
-        <input id="entryNote" type="text" placeholder="Notiz" class="input" />
+        <label class="field-label">Note (optional)</label>
+        <input id="entryNote" type="text" placeholder="Description" class="input" />
       </div>
 
       <div class="field">
-        <label class="field-label">Datum</label>
+        <label class="field-label">Date</label>
         <input id="entryDate" type="date" class="input" />
       </div>
 
       <div class="toggle-row" onclick="toggleSwitch('entryRecurring')">
-        <span>Wiederkehrend (monatlich)</span>
+        <span>Recurring (monthly)</span>
         <div id="entryRecurring" class="switch"></div>
       </div>
 
-      <button class="primary-btn" onclick="saveEntry()">Speichern</button>
-      <button id="deleteEntryBtn" class="delete-btn" onclick="deleteEntry()">Löschen</button>
+      <button class="primary-btn" onclick="saveEntry()">Save</button>
+      <button id="deleteEntryBtn" class="delete-btn" onclick="deleteEntry()">Delete</button>
     </div>
 
-    <!-- CUSTOM BOTTOM-SHEET FÜR KATEGORIE-WAHL -->
+    <!-- CATEGORY SHEET -->
     <div id="categorySheet" class="sheet-backdrop" onclick="closeCategorySheet(event)">
       <div class="sheet-box" onclick="event.stopPropagation()">
         <div class="modal-header" style="margin-bottom:14px">
-          <span class="modal-title" style="font-size:15px">Kategorie wählen</span>
+          <span class="modal-title" style="font-size:15px">Select Category</span>
           <button class="icon-btn" style="width:28px;height:28px" onclick="closeCategorySheet()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
@@ -1234,74 +979,74 @@
       </div>
     </div>
 
-    <!-- MODAL: INDIVIDUELLER ZEITRAUM -->
+    <!-- MODAL: RANGE -->
     <div id="modal-range" class="fullscreen-modal">
       <div class="modal-header">
-        <span class="modal-title">Zeitraum wählen</span>
+        <span class="modal-title">Select Date Range</span>
         <button class="icon-btn" onclick="closeModals()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
       <div class="field">
-        <label class="field-label">Startdatum</label>
+        <label class="field-label">Start Date</label>
         <input id="rangeStartInput" type="date" class="input" />
       </div>
       <div class="field">
-        <label class="field-label">Enddatum</label>
+        <label class="field-label">End Date</label>
         <input id="rangeEndInput" type="date" class="input" />
       </div>
-      <button class="primary-btn" onclick="applyCustomRange()">Zeitraum anwenden</button>
+      <button class="primary-btn" onclick="applyCustomRange()">Apply Range</button>
     </div>
 
-    <!-- MODAL: KATEGORIE (+ / BEARBEITEN) -->
+    <!-- MODAL: CATEGORY (+ / EDIT) -->
     <div id="modal-category" class="fullscreen-modal">
       <div class="modal-header">
-        <span class="modal-title">Kategorie</span>
+        <span class="modal-title">Category</span>
         <button class="icon-btn" onclick="closeModals()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
 
       <div class="seg-control two">
-        <div class="seg-btn active" data-ctype="expense" onclick="setCatType('expense')">Ausgaben</div>
-        <div class="seg-btn" data-ctype="income" onclick="setCatType('income')">Einnahmen</div>
+        <div class="seg-btn active" data-ctype="expense" onclick="setCatType('expense')">Expense</div>
+        <div class="seg-btn" data-ctype="income" onclick="setCatType('income')">Income</div>
       </div>
 
       <div class="field">
         <label class="field-label">Name</label>
-        <input id="catName" type="text" placeholder="Kategoriename" class="input" />
+        <input id="catName" type="text" placeholder="Category name" class="input" />
       </div>
 
       <div class="toggle-row" onclick="toggleSubcatSwitch()">
-        <span>Subkategorie</span>
+        <span>Subcategory</span>
         <div id="catIsSub" class="switch"></div>
       </div>
 
       <div id="parentCatField" class="field" style="display:none">
-        <label class="field-label">Übergeordnete Kategorie</label>
+        <label class="field-label">Parent Category</label>
         <div class="picker-trigger" onclick="openCategorySheet('parent')">
           <div class="item-left" id="parentCategoryDisplay">
-            <span style="font-size:14px;font-weight:600">Hauptkategorie wählen</span>
+            <span style="font-size:14px;font-weight:600">Select parent</span>
           </div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
       </div>
 
       <div class="field">
-        <label class="field-label">Farbton</label>
+        <label class="field-label">Color (50 Options)</label>
         <div id="colorGrid" class="swatch-grid"></div>
       </div>
 
       <div class="field">
-        <label class="field-label">Symbol nach Themengebiet</label>
+        <label class="field-label">Icon (50 Options)</label>
         <div id="iconGroupsContainer"></div>
       </div>
 
-      <button class="primary-btn" onclick="saveCategory()">Speichern</button>
-      <button id="deleteCatBtn" class="delete-btn" onclick="deleteCategory()">Löschen</button>
+      <button class="primary-btn" onclick="saveCategory()">Save</button>
+      <button id="deleteCatBtn" class="delete-btn" onclick="deleteCategory()">Delete</button>
     </div>
 
-    <!-- MODAL: INVESTMENT (+ / BEARBEITEN) -->
+    <!-- MODAL: INVESTMENT -->
     <div id="modal-investment" class="fullscreen-modal">
       <div class="modal-header">
         <span class="modal-title">Investment</span>
@@ -1311,89 +1056,104 @@
       </div>
 
       <div class="field">
-        <label class="field-label">Bezeichnung</label>
-        <input id="invName" type="text" placeholder="z. B. Welt-ETF" class="input" />
+        <label class="field-label">Name / ISIN</label>
+        <input id="invName" type="text" placeholder="e.g. MSCI World ETF" class="input" />
       </div>
 
       <div class="field">
-        <label class="field-label">Betrag (€)</label>
-        <input id="invAmount" type="number" step="0.01" placeholder="0,00" class="input" />
+        <label class="field-label">Amount (€)</label>
+        <input id="invAmount" type="number" step="0.01" placeholder="0.00" class="input" />
       </div>
 
       <div class="field">
-        <label class="field-label">Rendite / Zinssatz p.a. (%)</label>
+        <label class="field-label">Return p.a. (%)</label>
         <input id="invRate" type="number" step="0.1" value="7.0" class="input" />
       </div>
 
       <div class="field">
-        <label class="field-label">Startdatum</label>
+        <label class="field-label">Start Date</label>
         <input id="invDate" type="date" class="input" />
       </div>
 
       <div class="toggle-row" onclick="toggleInvRecurring()">
-        <span>Dauerauftrag (monatlich)</span>
+        <span>Savings Plan (monthly)</span>
         <div id="invRecurring" class="switch"></div>
       </div>
 
       <div id="invDynField" class="field" style="display:none">
-        <label class="field-label">Dynamik / Inflationsanpassung p.a. (%)</label>
+        <label class="field-label">Step-up p.a. (%)</label>
         <input id="invDyn" type="number" step="0.1" value="2.0" class="input" />
       </div>
 
       <div id="invFeeToggleRow" class="toggle-row" onclick="toggleInvFee()">
-        <span>Kaufkosten</span>
+        <span>Purchase Fee</span>
         <div id="invHasFee" class="switch"></div>
       </div>
 
       <div id="invFeeField" class="field" style="display:none">
-        <label class="field-label">Gebühr (€)</label>
+        <label class="field-label">Fee (€)</label>
         <input id="invFee" type="number" step="0.01" value="0.99" class="input" />
       </div>
 
-      <button class="primary-btn" onclick="saveInvestment()">Speichern</button>
-      <button id="deleteInvBtn" class="delete-btn" onclick="deleteInvestment()">Löschen</button>
+      <button class="primary-btn" onclick="saveInvestment()">Save</button>
+      <button id="deleteInvBtn" class="delete-btn" onclick="deleteInvestment()">Delete</button>
     </div>
 
-    <!-- MODAL: EINSTELLUNGEN -->
+    <!-- MODAL: SETTINGS -->
     <div id="modal-settings" class="fullscreen-modal">
       <div class="modal-header">
-        <span class="modal-title">Einstellungen</span>
+        <span class="modal-title">Settings</span>
         <button class="icon-btn" onclick="closeModals()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
 
+      <div class="field">
+        <label class="field-label">Language / Sprache</label>
+        <select id="langSelect" class="input" onchange="changeLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+        </select>
+      </div>
+
       <div class="toggle-row" onclick="toggleTheme()">
-        <span>Dunkelmodus</span>
+        <span>Dark Mode</span>
         <div id="themeSwitch" class="switch on"></div>
       </div>
 
+      <div class="toggle-row" onclick="toggleVibration()">
+        <span>Haptic Feedback / Vibration</span>
+        <div id="vibeSwitch" class="switch on"></div>
+      </div>
+
       <div class="toggle-row" onclick="toggleDailyNotification()">
-        <span>Tägliche Handy-Erinnerung</span>
+        <span>Daily Reminder</span>
         <div id="notifSwitch" class="switch"></div>
       </div>
 
       <div id="notifTimeField" class="field" style="display:none">
-        <label class="field-label">Erinnerungszeit</label>
+        <label class="field-label">Reminder Time</label>
         <input id="notifTimeInput" type="time" value="20:00" class="input" onchange="saveNotificationTime()" />
       </div>
 
       <div class="list-group" style="margin-top:12px">
         <div class="list-item" onclick="exportCSV()">
-          <span class="item-title">CSV Datenexport</span>
+          <span class="item-title">Export CSV</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
         </div>
         <div class="list-item" onclick="replayOnboarding()">
-          <span class="item-title">Visuelle Einführung starten</span>
+          <span class="item-title">Visual Introduction</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
         </div>
         <div class="list-item" onclick="resetAllData()">
-          <span class="item-title" style="color:var(--danger)">Alle Daten zurücksetzen</span>
+          <span class="item-title" style="color:var(--danger)">Reset All Data</span>
         </div>
       </div>
     </div>
 
-    <!-- MODAL: VISUELLE EINFÜHRUNGSREISE (Beim ersten Öffnen, ohne vorgefüllte Fremddaten) -->
+    <!-- MODAL: ONBOARDING -->
     <div id="modal-onboarding" class="fullscreen-modal">
       <div id="onboardStage" class="journey-stage"></div>
       <div id="onboardDots" class="dots"></div>
@@ -1402,89 +1162,134 @@
   </div>
 
   <script>
-    // Sortierte, umfangreiche Icon-Bibliothek im einheitlichen Linienstil
+    // 50 feine Icons in Themengebieten
     const ICON_GROUPS = {
-      'Wohnen & Alltag': {
+      'Home & Living': {
         home: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
         bolt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
         wifi: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>',
         key: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3"/></svg>',
         couch: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="8" width="16" height="8" rx="2"/><path d="M2 12v4h20v-4M6 16v3M18 16v3"/></svg>',
-        tool: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>'
+        tool: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+        droplet: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>',
+        thermometer: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>',
+        trash: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+        shield: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
       },
-      'Essen & Konsum': {
+      'Food & Lifestyle': {
         cart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
         coffee: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>',
         utensils: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
         bag: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
         gift: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/></svg>',
-        shirt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>'
+        shirt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>',
+        wine: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 22h8m-4-10v10m-4-7h8l-2-4H10l-2 4z"/><path d="M18 2H6v4a6 6 0 0 0 12 0V2z"/></svg>',
+        smile: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>',
+        scissors: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>',
+        camera: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>'
       },
-      'Mobilität & Reisen': {
+      'Mobility & Travel': {
         car: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="8" rx="2"/><path d="M5 11l2-5h10l2 5"/><circle cx="7.5" cy="15.5" r="1.5"/><circle cx="16.5" cy="15.5" r="1.5"/></svg>',
         train: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="15" rx="2"/><path d="M4 11h16M8 18l-2 3M16 18l2 3"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg>',
         bike: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>',
         plane: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>',
         fuel: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="12" height="18" rx="2"/><path d="M15 7h2a2 2 0 0 1 2 2v7a2 2 0 0 0 2 2v0a2 2 0 0 0 2-2V9l-3-3"/><line x1="6" y1="8" x2="12" y2="8"/></svg>',
-        compass: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>'
+        compass: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
+        map: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>',
+        anchor: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="3"/><line x1="12" y1="22" x2="12" y2="8"/><path d="M5 12H2a10 10 0 0 0 20 0h-3"/></svg>',
+        truck: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="1"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+        navigation: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>'
       },
-      'Beruf & Finanzen': {
+      'Work & Finance': {
         work: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>',
         wallet: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>',
         trend: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
-        shield: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
         bank: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 22 7 12 2"/><line x1="6" y1="10" x2="6" y2="17"/><line x1="10" y1="10" x2="10" y2="17"/><line x1="14" y1="10" x2="14" y2="17"/><line x1="18" y1="10" x2="18" y2="17"/><line x1="3" y1="20" x2="21" y2="20"/></svg>',
-        award: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>'
+        award: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
+        dollar: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+        pie: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>',
+        file: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>',
+        percent: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>',
+        tag: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>'
       },
-      'Freizeit, Bildung & Gesundheit': {
+      'Leisure & Tech': {
         heart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
         book: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
         music: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
         dumbbell: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M3 10l7-7M14 21l7-7"/></svg>',
         laptop: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>',
-        film: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>'
+        film: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',
+        gamepad: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="12" x2="18" y2="12"/><line x1="12" y1="6" x2="12" y2="18"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>',
+        smartphone: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+        cpu: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>',
+        headphones: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>'
       }
     };
 
     const ICONS = {};
     Object.values(ICON_GROUPS).forEach(group => Object.assign(ICONS, group));
 
-    // 18 kuratierte Farben
+    // Exakt 50 feine Farben zur Auswahl
     const COLORS = [
-      '#00D09C', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9', '#3B82F6',
-      '#6366F1', '#8B5CF6', '#A855F7', '#D946EF', '#EC4899', '#F43F5E',
-      '#EF4444', '#F97316', '#F59E0B', '#EAB308', '#84CC16', '#64748B'
+      '#00D09C', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9', '#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#D946EF',
+      '#EC4899', '#F43F5E', '#EF4444', '#F97316', '#F59E0B', '#EAB308', '#84CC16', '#22C55E', '#14B8A6', '#065F46',
+      '#1E293B', '#334155', '#475569', '#64748B', '#94A3B8', '#CBD5E1', '#991B1B', '#B91C1C', '#C2410C', '#B45309',
+      '#A16207', '#4D7C0F', '#15803D', '#0F766E', '#0369A1', '#1D4ED8', '#4338CA', '#6D28D9', '#7E22CE', '#86198F',
+      '#BE185D', '#9F1239', '#374151', '#111827', '#009688', '#FF5722', '#795548', '#607D8B', '#E91E63', '#9C27B0'
     ];
 
-    const MONTHS = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+    const TRANSLATIONS = {
+      en: {
+        home: "Home", cat: "Categories", invest: "Invest", ana: "Analytics",
+        netWorth: "Net Worth", income: "Income", expenses: "Expenses", loans: "Incl. Loans", total: "Total",
+        save: "Save", delete: "Delete", cancel: "Cancel", recurring: "Recurring", day: "Day", week: "Week", month: "Month", range: "Range",
+        settings: "Settings", darkMode: "Dark Mode", vibration: "Haptic Feedback / Vibration", reminder: "Daily Reminder"
+      },
+      de: {
+        home: "Start", cat: "Kategorien", invest: "Invest", ana: "Auswertung",
+        netWorth: "Vermögen", income: "Einnahmen", expenses: "Ausgaben", loans: "Inkl. Leihen", total: "Gesamt",
+        save: "Speichern", delete: "Löschen", cancel: "Abbrechen", recurring: "Wiederkehrend", day: "Tag", week: "Woche", month: "Monat", range: "Zeitraum",
+        settings: "Einstellungen", darkMode: "Dunkelmodus", vibration: "Haptisches Feedback / Vibration", reminder: "Tägliche Erinnerung"
+      },
+      es: {
+        home: "Inicio", cat: "Categorías", invest: "Invertir", ana: "Análisis",
+        netWorth: "Patrimonio", income: "Ingresos", expenses: "Gastos", loans: "Incl. Préstamos", total: "Total",
+        save: "Guardar", delete: "Eliminar", cancel: "Cancelar", recurring: "Recurrente", day: "Día", week: "Semana", month: "Mes", range: "Rango",
+        settings: "Ajustes", darkMode: "Modo Oscuro", vibration: "Vibración", reminder: "Recordatorio Diario"
+      },
+      fr: {
+        home: "Accueil", cat: "Catégories", invest: "Placements", ana: "Analyses",
+        netWorth: "Valeur Nette", income: "Revenus", expenses: "Dépenses", loans: "Prêts incl.", total: "Total",
+        save: "Enregistrer", delete: "Supprimer", cancel: "Annuler", recurring: "Récurrent", day: "Jour", week: "Semaine", month: "Mois", range: "Plage",
+        settings: "Paramètres", darkMode: "Mode Sombre", vibration: "Vibration", reminder: "Rappel Quotidien"
+      }
+    };
+
+    const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
     const STARTER_PRESETS = [
-      { key: 'salary', name: 'Gehalt', type: 'income', color: '#00D09C', icon: 'work' },
-      { key: 'housing', name: 'Wohnen', type: 'expense', color: '#3B82F6', icon: 'home' },
-      { key: 'food', name: 'Lebensmittel', type: 'expense', color: '#8B5CF6', icon: 'cart' },
-      { key: 'mobility', name: 'Mobilität', type: 'expense', color: '#F59E0B', icon: 'train' },
-      { key: 'leisure', name: 'Freizeit', type: 'expense', color: '#EC4899', icon: 'coffee' },
-      { key: 'education', name: 'Studium & Bildung', type: 'expense', color: '#06B6D4', icon: 'book' }
+      { key: 'salary', name: 'Salary', type: 'income', color: '#00D09C', icon: 'work' },
+      { key: 'housing', name: 'Housing', type: 'expense', color: '#3B82F6', icon: 'home' },
+      { key: 'food', name: 'Groceries', type: 'expense', color: '#8B5CF6', icon: 'cart' },
+      { key: 'mobility', name: 'Mobility', type: 'expense', color: '#F59E0B', icon: 'train' }
     ];
 
     function getTodayISO() {
       const d = new Date();
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}-${m}-${day}`;
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    // Standardmäßig komplett OHNE vorgefüllte Fremdbuchungen!
     const defaultState = {
+      lang: 'en',
       cursorDate: getTodayISO(),
-      granularity: 'month', // 'day' | 'week' | 'month' | 'range'
+      granularity: 'month',
       customStart: getTodayISO(),
       customEnd: getTodayISO(),
-      filter: 'actual', // 'actual' | 'income' | 'expense' | 'loans' | 'invest' | 'all'
+      filter: 'actual',
       onboarded: false,
       streak: 1,
       lastActiveDate: getTodayISO(),
+      vibeEnabled: true,
       notifEnabled: false,
       notifTime: '20:00',
       lastNotifDate: '',
@@ -1493,7 +1298,7 @@
       investments: []
     };
 
-    let state = JSON.parse(localStorage.getItem('finanzos_v4')) || defaultState;
+    let state = JSON.parse(localStorage.getItem('cashview_v5')) || defaultState;
 
     let currentTab = 'home';
     let editingEntryId = null;
@@ -1510,11 +1315,11 @@
     let selectedStarterKeys = ['salary', 'housing', 'food', 'mobility'];
 
     function saveState() {
-      localStorage.setItem('finanzos_v4', JSON.stringify(state));
+      localStorage.setItem('cashview_v5', JSON.stringify(state));
     }
 
     function haptic() {
-      if (navigator.vibrate) navigator.vibrate(12);
+      if (state.vibeEnabled && navigator.vibrate) navigator.vibrate(12);
     }
 
     function showToast(msg) {
@@ -1545,22 +1350,21 @@
       return parent ? shadeColor(parent.color, 26) : cat.color;
     }
 
-    // Berechnet Start- und Enddatum je nach gewählter Körnung (Tag, Woche, Monat, Zeitraum)
     function getPeriodBounds() {
       const cur = new Date(state.cursorDate + 'T12:00:00');
       if (state.granularity === 'day') {
         const iso = state.cursorDate;
-        const label = cur.toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: 'numeric' });
+        const label = cur.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
         return { start: iso, end: iso, label };
       }
       if (state.granularity === 'week') {
-        const dayOfWeek = (cur.getDay() + 6) % 7; // Montag = 0
+        const dayOfWeek = (cur.getDay() + 6) % 7;
         const mon = new Date(cur);
         mon.setDate(cur.getDate() - dayOfWeek);
         const sun = new Date(mon);
         sun.setDate(mon.getDate() + 6);
         const toISO = d => d.toISOString().split('T')[0];
-        const label = `${mon.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} – ${sun.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}`;
+        const label = `${mon.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit' })} – ${sun.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit' })}`;
         return { start: toISO(mon), end: toISO(sun), label };
       }
       if (state.granularity === 'range') {
@@ -1568,10 +1372,9 @@
         const e = state.customEnd >= state.customStart ? state.customEnd : state.customStart;
         const sd = new Date(s + 'T12:00:00');
         const ed = new Date(e + 'T12:00:00');
-        const label = `${sd.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} – ${ed.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}`;
+        const label = `${sd.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit' })} – ${ed.toLocaleDateString('en-US', { day: '2-digit', month: '2-digit' })}`;
         return { start: s, end: e, label };
       }
-      // Standard: Monat
       const y = cur.getFullYear();
       const m = cur.getMonth();
       const first = `${y}-${String(m + 1).padStart(2, '0')}-01`;
@@ -1601,9 +1404,7 @@
       haptic();
       state.granularity = g;
       document.querySelectorAll('.gran-btn').forEach(b => b.classList.toggle('active', b.dataset.gran === g));
-      if (g === 'range') {
-        openCustomRangeIfNeeded();
-      }
+      if (g === 'range') openCustomRangeIfNeeded();
       renderAll();
     }
 
@@ -1621,7 +1422,7 @@
       renderAll();
     }
 
-    // WICHTIG: Daueraufträge werden erst gebucht, wenn der eingestellte Tag tatsächlich erreicht ist (<= Heute)!
+    // Zukunftseinträge werden ausgegraut angezeigt, fließen aber erst ab Erreichung des Datums in den Kontostand ein
     function getEntriesInWindow(startISO, endISO) {
       const todayISO = getTodayISO();
       const results = [];
@@ -1629,10 +1430,9 @@
       state.entries.forEach(e => {
         if (!e.recurring) {
           if (e.date >= startISO && e.date <= endISO) {
-            results.push({ ...e, occDate: e.date });
+            results.push({ ...e, occDate: e.date, isFuture: e.date > todayISO });
           }
         } else {
-          // Monatliche Wiederholungen ab e.date erzeugen, aber NUR bis maximal heute (todayISO)
           const orig = new Date(e.date + 'T12:00:00');
           const origDay = orig.getDate();
           let y = orig.getFullYear();
@@ -1643,11 +1443,10 @@
             const day = Math.min(origDay, maxDay);
             const occISO = `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-            // Liegt der Ausführungstag in der Zukunft (> heute), wird er noch NICHT eingetragen!
-            if (occISO > todayISO || occISO > endISO) break;
+            if (occISO > endISO) break;
 
             if (occISO >= startISO && occISO >= e.date) {
-              results.push({ ...e, occDate: occISO });
+              results.push({ ...e, occDate: occISO, isFuture: occISO > todayISO });
             }
 
             m++;
@@ -1659,7 +1458,7 @@
       return results.sort((a, b) => b.occDate.localeCompare(a.occDate));
     }
 
-    // Investment-Berechnung: Daueraufträge führen Raten nur bis zum heutigen Stichtag aus
+    // Tägliche präzise Zinsberechnung für Investments
     function calcInvestmentsUpTo(endISO) {
       const todayISO = getTodayISO();
       const effectiveCutISO = endISO < todayISO ? endISO : todayISO;
@@ -1667,6 +1466,7 @@
 
       let invested = 0;
       let value = 0;
+      let dailyEarnTotal = 0;
       const items = [];
 
       state.investments.forEach(inv => {
@@ -1706,20 +1506,22 @@
           }
         }
 
+        const itemDailyEarn = itemVal * rDay;
+        dailyEarnTotal += itemDailyEarn;
+
         invested += itemIn;
         value += itemVal;
-        items.push({ ...inv, itemIn, itemVal });
+        items.push({ ...inv, itemIn, itemVal, itemDailyEarn });
       });
 
-      return { invested, value, items };
+      return { invested, value, dailyEarnTotal, items };
     }
 
     function renderHome() {
       const bounds = getPeriodBounds();
       document.getElementById('periodLabel').textContent = bounds.label;
-      document.getElementById('streakCount').textContent = `${state.streak}T`;
+      document.getElementById('streakCount').textContent = `${state.streak}D`;
 
-      // Atmosphärische Stimmung (Einnahmen = Smaragd-Futuristisch, Ausgaben = Ruhiges Rubinrot)
       const shell = document.getElementById('appShell');
       if (currentTab === 'home' && state.filter === 'income') {
         shell.setAttribute('data-mood', 'income');
@@ -1734,6 +1536,7 @@
 
       let income = 0, expense = 0, loans = 0;
       entries.forEach(e => {
+        if (e.isFuture) return; // Zukunftseinträge fließen noch nicht in die Bilanz ein
         if (e.type === 'income') income += e.amount;
         if (e.type === 'expense') expense += e.amount;
         if (e.type === 'loan') loans += e.amount;
@@ -1741,16 +1544,6 @@
 
       const actualCash = income - expense;
       let displayedTotal = actualCash;
-
-      const titles = {
-        actual: 'Vermögen',
-        income: 'Einnahmen',
-        expense: 'Ausgaben',
-        loans: 'Inkl. Leihen',
-        invest: 'Investitionen',
-        all: 'Gesamt'
-      };
-      document.getElementById('filterTitle').textContent = titles[state.filter];
 
       if (state.filter === 'income') displayedTotal = income;
       if (state.filter === 'expense') displayedTotal = expense;
@@ -1760,11 +1553,11 @@
 
       document.getElementById('homeTotal').textContent = formatEUR(displayedTotal);
 
-      // Kreisdiagramm-Segmente je nach Filter
       const slices = [];
       if (state.filter !== 'invest') {
         const grouped = {};
         entries.forEach(e => {
+          if (e.isFuture) return;
           if (state.filter === 'actual' && e.type === 'loan') return;
           if (state.filter === 'income' && e.type !== 'income') return;
           if (state.filter === 'expense' && e.type !== 'expense') return;
@@ -1783,7 +1576,6 @@
 
       renderDonut(slices);
 
-      // Transaktionsliste
       const listEl = document.getElementById('homeList');
       listEl.innerHTML = '';
 
@@ -1795,8 +1587,8 @@
         return true;
       });
 
-      if (filteredEntries.length === 0 && state.filter !== 'invest') {
-        listEl.innerHTML = `<div class="empty-hint">Keine Buchungen in diesem Zeitraum. Tippe unten auf <b>+</b> zum Eintragen.</div>`;
+      if (filteredEntries.length === 0) {
+        listEl.innerHTML = `<div class="empty-hint">No transactions in this period. Tap <b>+</b> below to add one.</div>`;
         return;
       }
 
@@ -1805,14 +1597,14 @@
         const color = getCatColor(cat);
         const sign = e.type === 'income' ? '+' : e.type === 'expense' ? '-' : '⇄ ';
         const row = document.createElement('div');
-        row.className = 'list-item';
+        row.className = 'list-item' + (e.isFuture ? ' future-pending' : '');
         row.onclick = () => openEntryModal(e.id);
         row.innerHTML = `
           <div class="item-left">
             <div class="cat-icon" style="background:${color}">${ICONS[cat?.icon || 'home']}</div>
             <div>
-              <div class="item-title">${e.note || cat?.name || 'Buchung'}</div>
-              <div class="item-sub">${cat?.name || 'Kategorie'} · ${new Date(e.occDate + 'T12:00:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}${e.recurring ? ' · Dauerauftrag' : ''}</div>
+              <div class="item-title">${e.note || cat?.name || 'Transaction'} ${e.isFuture ? '<span style="font-size:10px;color:var(--accent);font-weight:700">(Pending)</span>' : ''}</div>
+              <div class="item-sub">${cat?.name || 'Category'} · ${new Date(e.occDate + 'T12:00:00').toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}${e.recurring ? ' · Recurring' : ''}</div>
             </div>
           </div>
           <div class="item-amount ${e.type === 'income' ? 'pos' : 'neg'}">${sign}${formatEUR(e.amount)}</div>
@@ -1865,7 +1657,7 @@
       const list = document.getElementById('catList');
       list.innerHTML = '';
       if (state.categories.length === 0) {
-        list.innerHTML = `<div class="empty-hint">Noch keine Kategorien angelegt. Tippe unten auf <b>+</b>.</div>`;
+        list.innerHTML = `<div class="empty-hint">No categories yet. Tap <b>+</b> below.</div>`;
         return;
       }
 
@@ -1887,7 +1679,7 @@
           <div class="cat-icon" style="background:${getCatColor(cat)}">${ICONS[cat.icon || 'home']}</div>
           <div class="item-title">${cat.name}</div>
         </div>
-        <div class="item-sub" style="font-weight:700;color:${cat.type === 'income' ? 'var(--accent)' : 'var(--muted)'}">${cat.type === 'income' ? 'Einnahmen' : 'Ausgaben'}</div>
+        <div class="item-sub" style="font-weight:700;color:${cat.type === 'income' ? 'var(--accent)' : 'var(--muted)'}">${cat.type}</div>
       `;
       return row;
     }
@@ -1899,12 +1691,13 @@
       const pct = data.invested > 0 ? (gain / data.invested) * 100 : 0;
 
       document.getElementById('invTotal').textContent = formatEUR(data.value);
-      document.getElementById('invGain').textContent = `${gain >= 0 ? '+' : ''}${formatEUR(gain)} (${pct.toFixed(1)}%)`;
+      document.getElementById('invDailyEarn').textContent = `+${formatEUR(data.dailyEarnTotal)} today`;
+      document.getElementById('invGain').textContent = `Total ${gain >= 0 ? '+' : ''}${formatEUR(gain)} (${pct.toFixed(1)}%)`;
 
       const list = document.getElementById('invList');
       list.innerHTML = '';
       if (data.items.length === 0) {
-        list.innerHTML = `<div class="empty-hint">Noch keine Investments oder Sparpläne eingetragen.</div>`;
+        list.innerHTML = `<div class="empty-hint">No investments added yet.</div>`;
         return;
       }
 
@@ -1915,12 +1708,10 @@
         row.onclick = () => openInvestmentModal(it.id);
         row.innerHTML = `
           <div class="item-left">
-            <div class="cat-icon" style="background:var(--accent-dim);color:var(--accent)">
-              ${ICONS.trend}
-            </div>
+            <div class="cat-icon" style="background:var(--accent-dim);color:var(--accent)">${ICONS.trend}</div>
             <div>
               <div class="item-title">${it.name}</div>
-              <div class="item-sub">${it.rate}% p.a.${it.recurring ? ` · Sparplan (+${it.dyn || 0}% Dynamik)` : ''}</div>
+              <div class="item-sub">${it.rate}% p.a. (+${formatEUR(it.itemDailyEarn)}/day)</div>
             </div>
           </div>
           <div>
@@ -1939,6 +1730,7 @@
       let inc = 0, exp = 0;
       const byCat = {};
       entries.forEach(e => {
+        if (e.isFuture) return;
         if (e.type === 'income') inc += e.amount;
         if (e.type === 'expense') {
           exp += e.amount;
@@ -1958,7 +1750,7 @@
       Object.keys(byCat).forEach(cid => {
         if (byCat[cid] > topCatVal) {
           topCatVal = byCat[cid];
-          topCatName = state.categories.find(c => c.id === cid)?.name || 'Sonstiges';
+          topCatName = state.categories.find(c => c.id === cid)?.name || 'Other';
         }
       });
 
@@ -1969,7 +1761,6 @@
       document.getElementById('kpiTopCat').textContent = topCatName;
       document.getElementById('cashflowSummaryLabel').textContent = `+${Math.round(inc)} € / -${Math.round(exp)} €`;
 
-      // 1. 6-Monats-Cashflow
       const cfContainer = document.getElementById('cashflowBars');
       cfContainer.innerHTML = '';
       const refDate = new Date(state.cursorDate + 'T12:00:00');
@@ -1984,6 +1775,7 @@
 
         let mInc = 0, mExp = 0;
         mEntries.forEach(e => {
+          if (e.isFuture) return;
           if (e.type === 'income') mInc += e.amount;
           if (e.type === 'expense') mExp += e.amount;
         });
@@ -2005,13 +1797,12 @@
         cfContainer.appendChild(col);
       }
 
-      // 2. Top-Kategorien Aufschlüsselung mit Fortschrittsbalken
       const breakEl = document.getElementById('analyticsCatBreakdown');
       breakEl.innerHTML = '';
       const sortedCats = Object.keys(byCat).sort((a, b) => byCat[b] - byCat[a]);
 
       if (sortedCats.length === 0) {
-        breakEl.innerHTML = `<div style="font-size:12px;color:var(--muted)">Noch keine Ausgaben im gewählten Zeitraum.</div>`;
+        breakEl.innerHTML = `<div style="font-size:12px;color:var(--muted)">No expenses in this period.</div>`;
       } else {
         sortedCats.forEach(cid => {
           const cat = state.categories.find(c => c.id === cid);
@@ -2021,7 +1812,7 @@
           row.className = 'cat-breakdown-row';
           row.innerHTML = `
             <div class="cat-breakdown-head">
-              <span style="font-weight:600">${cat?.name || 'Kategorie'}</span>
+              <span style="font-weight:600">${cat?.name || 'Category'}</span>
               <span style="color:var(--muted)">${formatEUR(val)} (${pct}%)</span>
             </div>
             <div class="progress-track">
@@ -2031,51 +1822,12 @@
           breakEl.appendChild(row);
         });
       }
-
-      // 3. Zinseszins-Projektion (1J, 3J, 5J, 10J auf Basis aktiver Investments)
-      const wContainer = document.getElementById('wealthBars');
-      wContainer.innerHTML = '';
-      const horizons = [1, 3, 5, 10];
-      const projections = horizons.map(yr => {
-        let totalFuture = 0;
-        state.investments.forEach(inv => {
-          const rMonth = Math.pow(1 + (inv.rate || 0) / 100, 1 / 12) - 1;
-          const months = yr * 12;
-          if (!inv.recurring) {
-            totalFuture += inv.amount * Math.pow(1 + rMonth, months);
-          } else {
-            let v = 0;
-            for (let k = 0; k < months; k++) {
-              const rateAmt = inv.amount * Math.pow(1 + (inv.dyn || 0) / 100, Math.floor(k / 12));
-              v = (v + rateAmt) * (1 + rMonth);
-            }
-            totalFuture += v;
-          }
-        });
-        return { yr, val: totalFuture };
-      });
-
-      const maxProj = Math.max(...projections.map(p => p.val), 1000);
-      projections.forEach(p => {
-        const h = Math.max(6, Math.round((p.val / maxProj) * 86));
-        const col = document.createElement('div');
-        col.className = 'bar-col';
-        col.innerHTML = `
-          <span class="bar-val-top">${Math.round(p.val).toLocaleString('de-DE')} €</span>
-          <div class="bar-pair">
-            <div class="bar" style="height:${h}px;background:var(--accent);width:22px"></div>
-          </div>
-          <span class="bar-lbl">+${p.yr} J.</span>
-        `;
-        wContainer.appendChild(col);
-      });
     }
 
     function renderAll() {
-      // Header-Sichtbarkeit je nach Tab steuern
-      const isCatTab = currentTab === 'categories';
-      document.getElementById('periodNavWrap').style.display = isCatTab ? 'none' : 'flex';
-      document.getElementById('staticHeaderTitle').style.display = isCatTab ? 'block' : 'none';
+      const isShowNav = currentTab !== 'categories';
+      document.getElementById('periodNavWrap').style.display = isShowNav ? 'flex' : 'none';
+      document.getElementById('staticHeaderTitle').style.display = isShowNav ? 'none' : 'block';
       document.getElementById('homeSubBar').style.display = currentTab === 'home' ? 'flex' : 'none';
 
       renderHome();
@@ -2112,6 +1864,8 @@
 
     function openSettings() {
       haptic();
+      document.getElementById('langSelect').value = state.lang;
+      document.getElementById('vibeSwitch').classList.toggle('on', !!state.vibeEnabled);
       document.getElementById('notifSwitch').classList.toggle('on', !!state.notifEnabled);
       document.getElementById('notifTimeField').style.display = state.notifEnabled ? 'block' : 'none';
       document.getElementById('notifTimeInput').value = state.notifTime || '20:00';
@@ -2122,24 +1876,25 @@
       document.querySelectorAll('.fullscreen-modal').forEach(m => m.classList.remove('open'));
     }
 
-    // Custom Kategorie-Bottom-Sheet
+    function changeLanguage(lang) {
+      haptic();
+      state.lang = lang;
+      saveState();
+      showToast('Language updated');
+    }
+
+    // Category Sheet
     function openCategorySheet(mode) {
       haptic();
       sheetMode = mode;
       const list = document.getElementById('categorySheetList');
       list.innerHTML = '';
 
-      const targetType = mode === 'entry'
-        ? (entryType === 'income' ? 'income' : 'expense')
-        : catType;
-
-      const available = state.categories.filter(c => {
-        if (mode === 'parent') return !c.parentId && c.id !== editingCatId && c.type === targetType;
-        return c.type === targetType;
-      });
+      const targetType = mode === 'entry' ? (entryType === 'income' ? 'income' : 'expense') : catType;
+      const available = state.categories.filter(c => mode === 'parent' ? (!c.parentId && c.id !== editingCatId && c.type === targetType) : c.type === targetType);
 
       if (available.length === 0) {
-        list.innerHTML = `<div class="empty-hint">Noch keine passende Kategorie vorhanden. Lege zuerst eine im Reiter „Kategorien“ an.</div>`;
+        list.innerHTML = `<div class="empty-hint">No matching category. Add one in the Categories tab first.</div>`;
       } else {
         available.forEach(c => {
           const row = document.createElement('div');
@@ -2154,7 +1909,6 @@
           list.appendChild(row);
         });
       }
-
       document.getElementById('categorySheet').classList.add('open');
     }
 
@@ -2162,7 +1916,6 @@
       haptic();
       const cat = state.categories.find(c => c.id === cid);
       if (!cat) return;
-
       if (sheetMode === 'entry') {
         selectedEntryCatId = cid;
         updateEntryCategoryDisplay();
@@ -2177,15 +1930,9 @@
       const box = document.getElementById('entryCategoryDisplay');
       const cat = state.categories.find(c => c.id === selectedEntryCatId);
       if (!cat) {
-        box.innerHTML = `
-          <div class="cat-icon" style="width:28px;height:28px;background:var(--border)"></div>
-          <span style="font-size:14px;font-weight:600;color:var(--muted)">Kategorie wählen</span>
-        `;
+        box.innerHTML = `<div class="cat-icon" style="width:28px;height:28px;background:var(--border)"></div><span style="font-size:14px;font-weight:600;color:var(--muted)">Select category</span>`;
       } else {
-        box.innerHTML = `
-          <div class="cat-icon" style="width:28px;height:28px;background:${getCatColor(cat)}">${ICONS[cat.icon || 'home']}</div>
-          <span style="font-size:14px;font-weight:600">${cat.name}</span>
-        `;
+        box.innerHTML = `<div class="cat-icon" style="width:28px;height:28px;background:${getCatColor(cat)}">${ICONS[cat.icon || 'home']}</div><span style="font-size:14px;font-weight:600">${cat.name}</span>`;
       }
     }
 
@@ -2193,12 +1940,9 @@
       const box = document.getElementById('parentCategoryDisplay');
       const cat = state.categories.find(c => c.id === selectedParentCatId);
       if (!cat) {
-        box.innerHTML = `<span style="font-size:14px;font-weight:600;color:var(--muted)">Hauptkategorie wählen</span>`;
+        box.innerHTML = `<span style="font-size:14px;font-weight:600;color:var(--muted)">Select parent</span>`;
       } else {
-        box.innerHTML = `
-          <div class="cat-icon" style="width:28px;height:28px;background:${getCatColor(cat)}">${ICONS[cat.icon || 'home']}</div>
-          <span style="font-size:14px;font-weight:600">${cat.name}</span>
-        `;
+        box.innerHTML = `<div class="cat-icon" style="width:28px;height:28px;background:${getCatColor(cat)}">${ICONS[cat.icon || 'home']}</div><span style="font-size:14px;font-weight:600">${cat.name}</span>`;
       }
     }
 
@@ -2206,7 +1950,7 @@
       document.getElementById('categorySheet').classList.remove('open');
     }
 
-    // Buchungs-Modal
+    // Entry Modal
     function openEntryModal(id = null) {
       haptic();
       editingEntryId = id;
@@ -2230,7 +1974,6 @@
         document.getElementById('entryRecurring').classList.remove('on');
         delBtn.style.display = 'none';
       }
-
       document.getElementById('modal-entry').classList.add('open');
     }
 
@@ -2250,14 +1993,8 @@
 
     function saveEntry() {
       const amount = parseFloat(document.getElementById('entryAmount').value);
-      if (!amount || amount <= 0) {
-        showToast('Bitte Betrag eingeben');
-        return;
-      }
-      if (!selectedEntryCatId) {
-        showToast('Bitte Kategorie wählen');
-        return;
-      }
+      if (!amount || amount <= 0) { showToast('Please enter amount'); return; }
+      if (!selectedEntryCatId) { showToast('Please select category'); return; }
 
       const data = {
         id: editingEntryId || 'e' + Date.now(),
@@ -2275,21 +2012,22 @@
       } else {
         state.entries.unshift(data);
         updateStreak();
+        checkSecondEntryReminder();
       }
 
       closeModals();
       renderAll();
-      showToast('Buchung gespeichert');
+      showToast('Saved');
     }
 
     function deleteEntry() {
       state.entries = state.entries.filter(x => x.id !== editingEntryId);
       closeModals();
       renderAll();
-      showToast('Gelöscht');
+      showToast('Deleted');
     }
 
-    // Kategorie-Modal mit 18 Farben & sortierten Themen-Icons
+    // Category Modal with 50 Colors & 50 Icons
     function openCategoryModal(id = null) {
       haptic();
       editingCatId = id;
@@ -2387,17 +2125,17 @@
 
       closeModals();
       renderAll();
-      showToast('Kategorie gespeichert');
+      showToast('Category saved');
     }
 
     function deleteCategory() {
       state.categories = state.categories.filter(x => x.id !== editingCatId);
       closeModals();
       renderAll();
-      showToast('Gelöscht');
+      showToast('Deleted');
     }
 
-    // Investment-Modal
+    // Investment Modal
     function openInvestmentModal(id = null) {
       haptic();
       editingInvId = id;
@@ -2423,7 +2161,6 @@
         document.getElementById('invHasFee').classList.remove('on');
         delBtn.style.display = 'none';
       }
-
       syncInvToggles();
       document.getElementById('modal-investment').classList.add('open');
     }
@@ -2471,65 +2208,58 @@
       } else {
         state.investments.push(data);
       }
-
       closeModals();
       renderAll();
-      showToast('Investment gespeichert');
+      showToast('Investment saved');
     }
 
     function deleteInvestment() {
       state.investments = state.investments.filter(x => x.id !== editingInvId);
       closeModals();
       renderAll();
-      showToast('Gelöscht');
+      showToast('Deleted');
     }
 
-    // Tägliche Handy-Benachrichtigung statt nervigem Banner
+    function toggleVibration() {
+      state.vibeEnabled = !state.vibeEnabled;
+      document.getElementById('vibeSwitch').classList.toggle('on', state.vibeEnabled);
+      saveState();
+      showToast(state.vibeEnabled ? 'Haptic feedback on' : 'Haptic feedback off');
+    }
+
     async function toggleDailyNotification() {
       const sw = document.getElementById('notifSwitch');
       const next = !sw.classList.contains('on');
-
       if (next && 'Notification' in window) {
         const perm = await Notification.requestPermission();
         if (perm !== 'granted') {
-          showToast('Bitte Benachrichtigungen im System erlauben');
+          showToast('Please enable notifications in system settings');
           return;
         }
       }
-
       state.notifEnabled = next;
       sw.classList.toggle('on', next);
       document.getElementById('notifTimeField').style.display = next ? 'block' : 'none';
       saveState();
-      if (next) showToast(`Tägliche Erinnerung um ${state.notifTime} Uhr aktiv`);
+      if (next) showToast(`Reminder set for ${state.notifTime}`);
     }
 
     function saveNotificationTime() {
       state.notifTime = document.getElementById('notifTimeInput').value || '20:00';
       saveState();
-      showToast(`Erinnerung auf ${state.notifTime} Uhr gestellt`);
+      showToast(`Reminder set to ${state.notifTime}`);
     }
 
-    function checkDailyNotificationTrigger() {
-      if (!state.notifEnabled || !('Notification' in window) || Notification.permission !== 'granted') return;
-      const now = new Date();
-      const today = getTodayISO();
-      const currentHM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      if (currentHM >= state.notifTime && state.lastNotifDate !== today) {
-        state.lastNotifDate = today;
+    // Erinnerung nach der ZWEITEN Buchung
+    function checkSecondEntryReminder() {
+      if (state.entries.length === 2 && !state.notifAsked) {
+        state.notifAsked = true;
         saveState();
-        if (navigator.serviceWorker && navigator.serviceWorker.ready) {
-          navigator.serviceWorker.ready.then(reg => {
-            reg.showNotification('FinanzOS', {
-              body: 'Zeit für deinen kurzen Tagesabschluss.',
-              silent: false
-            });
-          });
+        if (confirm('Great job logging your first transactions! Would you like to enable daily reminders?')) {
+          toggleDailyNotification();
         }
       }
     }
-
-    setInterval(checkDailyNotificationTrigger, 45000);
 
     function updateStreak() {
       const today = getTodayISO();
@@ -2547,7 +2277,7 @@
     }
 
     function exportCSV() {
-      const rows = [['Datum','Typ','Betrag','Kategorie','Notiz']];
+      const rows = [['Date','Type','Amount','Category','Note']];
       state.entries.forEach(e => {
         const c = state.categories.find(x => x.id === e.categoryId)?.name || '';
         rows.push([e.date, e.type, e.amount, c, e.note || '']);
@@ -2556,17 +2286,17 @@
       const blob = new Blob([csv], { type: 'text/csv' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'finanzos_export.csv';
+      a.download = 'cashview_export.csv';
       a.click();
-      showToast('CSV exportiert');
+      showToast('CSV exported');
     }
 
     function resetAllData() {
-      localStorage.removeItem('finanzos_v4');
+      localStorage.removeItem('cashview_v5');
       location.reload();
     }
 
-    // Visuelle Einführungsreise (Langsam & Interaktiv zum Selbst-Einrichten)
+    // Onboarding (Benachrichtigungen bewusst HIER noch nicht abgefragt)
     function renderOnboarding() {
       const stage = document.getElementById('onboardStage');
       const dots = document.getElementById('onboardDots');
@@ -2582,18 +2312,18 @@
       if (onboardStep === 0) {
         stage.innerHTML = `
           <div class="journey-orb">${ICONS.trend}</div>
-          <h2 style="font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:10px">Willkommen bei FinanzOS.</h2>
+          <h2 style="font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:10px">Welcome to Cashview.</h2>
           <p style="font-size:14px;color:var(--muted);line-height:1.6;max-width:290px">
-            Eine ruhige, mathematisch präzise Umgebung für dein Vermögen, deine Ausgaben und deine Investments.
+            A serene, precise environment for your net worth, expenses and investments.
           </p>
         `;
-        act.innerHTML = `<button class="primary-btn" onclick="nextOnboard()">Reise starten</button>`;
+        act.innerHTML = `<button class="primary-btn" onclick="nextOnboard()">Start Journey</button>`;
       } else if (onboardStep === 1) {
         stage.innerHTML = `
           <div class="journey-orb">${ICONS.home}</div>
-          <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Wähle deine Grundstruktur.</h2>
+          <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Select Core Categories.</h2>
           <p style="font-size:13px;color:var(--muted);max-width:290px">
-            Tippe die Kategorien an, mit denen du starten möchtest. Du kannst sie jederzeit frei erweitern.
+            Tap the categories you want to start with. You can customize them anytime.
           </p>
           <div class="chip-grid">
             ${STARTER_PRESETS.map(p => `
@@ -2604,23 +2334,19 @@
             `).join('')}
           </div>
         `;
-        act.innerHTML = `<button class="primary-btn" onclick="nextOnboard()">Weiter</button>`;
+        act.innerHTML = `<button class="primary-btn" onclick="nextOnboard()">Continue</button>`;
       } else if (onboardStep === 2) {
         stage.innerHTML = `
           <div class="journey-orb">${ICONS.wallet}</div>
-          <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Startbestand & Erinnerung</h2>
+          <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Initial Balance</h2>
           <p style="font-size:13px;color:var(--muted);margin-bottom:16px;max-width:290px">
-            Trage optional deinen aktuellen Kontostand ein oder starte direkt bei 0,00 €.
+            Optionally enter your current starting balance or start at 0.00 €.
           </p>
           <div style="width:100%;max-width:280px">
-            <input id="onboardInitialBalance" type="number" step="0.01" placeholder="0,00 € Startbetrag (optional)" class="input" style="text-align:center;margin-bottom:12px" />
-            <div class="toggle-row" onclick="toggleOnboardNotif()">
-              <span style="font-size:13px">Tägliche Handy-Erinnerung</span>
-              <div id="onboardNotifSwitch" class="switch ${state.notifEnabled ? 'on' : ''}"></div>
-            </div>
+            <input id="onboardInitialBalance" type="number" step="0.01" placeholder="0.00 € Balance (optional)" class="input" style="text-align:center;" />
           </div>
         `;
-        act.innerHTML = `<button class="primary-btn" onclick="finishOnboarding()">FinanzOS öffnen</button>`;
+        act.innerHTML = `<button class="primary-btn" onclick="finishOnboarding()">Open Cashview</button>`;
       }
     }
 
@@ -2631,11 +2357,6 @@
       } else {
         selectedStarterKeys.push(key);
       }
-      renderOnboarding();
-    }
-
-    async function toggleOnboardNotif() {
-      await toggleDailyNotification();
       renderOnboarding();
     }
 
@@ -2667,7 +2388,7 @@
       if (initBal && initBal > 0) {
         let incCat = state.categories.find(c => c.type === 'income');
         if (!incCat) {
-          incCat = { id: 'c_start_inc', name: 'Startbestand', type: 'income', color: '#00D09C', icon: 'wallet', parentId: null };
+          incCat = { id: 'c_start_inc', name: 'Starting Balance', type: 'income', color: '#00D09C', icon: 'wallet', parentId: null };
           state.categories.push(incCat);
         }
         state.entries.push({
@@ -2675,7 +2396,7 @@
           type: 'income',
           amount: initBal,
           categoryId: incCat.id,
-          note: 'Startbestand',
+          note: 'Initial Balance',
           date: getTodayISO(),
           recurring: false
         });
@@ -2684,7 +2405,7 @@
       state.onboarded = true;
       closeModals();
       renderAll();
-      showToast('Bereit');
+      showToast('Ready');
     }
 
     function replayOnboarding() {
@@ -2693,6 +2414,16 @@
       renderOnboarding();
       document.getElementById('modal-onboarding').classList.add('open');
     }
+
+    // Intro Logo Splash Fade-out
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const splash = document.getElementById('introSplash');
+        if (splash) {
+          splash.classList.add('fade-out');
+        }
+      }, 750);
+    });
 
     if (!state.onboarded) {
       replayOnboarding();
