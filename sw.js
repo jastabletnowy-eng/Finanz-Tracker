@@ -1,8 +1,9 @@
-const CACHE_NAME = 'finanzos-offline-v2';
+const CACHE_NAME = 'cashview-offline-v4';
 const ASSETS = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './icon.png'
 ];
 
 self.addEventListener('install', event => {
