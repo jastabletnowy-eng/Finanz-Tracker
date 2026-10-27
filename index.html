@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>FinanzOS</title>
+  <title>Cashview - Haushaltsbuch</title>
 
-  <!-- Saubere PWA-Verknüpfung -->
   <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="icon.png" />
+  <link rel="apple-touch-icon" href="icon.png" />
   <meta name="theme-color" content="#0B0E14" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -46,13 +47,13 @@
     .app-shell[data-mood="income"] {
       --accent: #00E6A8;
       --accent-dim: rgba(0, 230, 168, 0.18);
-      --ambient-glow: radial-gradient(circle at 50% 8%, rgba(0, 230, 168, 0.26) 0%, rgba(0, 168, 255, 0.08) 45%, transparent 75%);
+      --ambient-glow: radial-gradient(circle at 50% 8%, rgba(0, 230, 168, 0.28) 0%, rgba(0, 168, 255, 0.08) 45%, transparent 75%);
     }
 
     .app-shell[data-mood="expense"] {
       --accent: #E85D75;
       --accent-dim: rgba(232, 93, 117, 0.16);
-      --ambient-glow: radial-gradient(circle at 50% 8%, rgba(232, 93, 117, 0.24) 0%, rgba(168, 50, 75, 0.07) 45%, transparent 75%);
+      --ambient-glow: radial-gradient(circle at 50% 8%, rgba(232, 93, 117, 0.25) 0%, rgba(168, 50, 75, 0.08) 45%, transparent 75%);
     }
 
     * {
@@ -64,7 +65,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", system-ui, sans-serif;
     }
 
-    /* Verhindert Pull-to-Refresh und Layout-Dehnung auf Android/iOS */
+    /* Verhindert Pull-to-Refresh und Layout-Dehnung */
     html, body {
       position: fixed;
       inset: 0;
@@ -95,6 +96,78 @@
       transition: background 0.65s ease, color 0.5s ease;
     }
 
+    @media (max-width: 460px) {
+      .app-shell {
+        max-width: 100%;
+        max-height: none;
+        border-radius: 0;
+        border: none;
+      }
+    }
+
+    /* Subtile Start-Logo-Animation */
+    .splash-screen {
+      position: absolute;
+      inset: 0;
+      background: #0B0E14;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.7s;
+    }
+
+    .splash-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .splash-logo-wrap {
+      width: 96px;
+      height: 96px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: splashScale 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .splash-ring {
+      stroke-dasharray: 280;
+      stroke-dashoffset: 280;
+      animation: drawSplashRing 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+    }
+
+    .splash-trend {
+      stroke-dasharray: 100;
+      stroke-dashoffset: 100;
+      animation: drawSplashRing 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.45s forwards;
+    }
+
+    .splash-title {
+      margin-top: 16px;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #F3F5F8;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: splashTextIn 0.7s ease 0.5s forwards;
+    }
+
+    @keyframes drawSplashRing {
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes splashScale {
+      0% { transform: scale(0.86); filter: blur(4px); opacity: 0; }
+      100% { transform: scale(1); filter: blur(0); opacity: 1; }
+    }
+    @keyframes splashTextIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .ambient-layer {
       position: absolute;
       inset: 0;
@@ -108,15 +181,6 @@
     @keyframes ambientPulse {
       0% { opacity: 0.75; transform: scale(1); }
       100% { opacity: 1; transform: scale(1.06); }
-    }
-
-    @media (max-width: 460px) {
-      .app-shell {
-        max-width: 100%;
-        max-height: none;
-        border-radius: 0;
-        border: none;
-      }
     }
 
     /* Top Header */
@@ -161,7 +225,7 @@
       color: var(--text);
       cursor: pointer;
       width: fit-content;
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.4s ease;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .streak-pill:active {
@@ -212,7 +276,7 @@
       background: var(--accent-dim);
     }
 
-    /* Granularity Pills (Tag, Woche, Monat, Zeitraum) */
+    /* Granularity Pills */
     .granularity-bar {
       display: inline-flex;
       background: var(--card);
@@ -289,7 +353,7 @@
       to { transform: translateY(0); opacity: 1; }
     }
 
-    /* Custom Bottom-Sheet Picker (für Kategorien-Auswahl) */
+    /* Custom Bottom-Sheet Picker */
     .sheet-backdrop {
       position: absolute;
       inset: 0;
@@ -338,14 +402,34 @@
       text-transform: uppercase;
       letter-spacing: 1px;
       margin-bottom: 4px;
-      transition: color 0.5s ease;
     }
 
     .hero-amount {
       font-size: 34px;
       font-weight: 700;
       letter-spacing: -1px;
-      transition: color 0.5s ease, transform 0.5s ease;
+    }
+
+    .yield-pills {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .yield-pill {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .yield-pill b {
+      color: var(--accent);
+      font-weight: 600;
     }
 
     .donut-wrap {
@@ -362,7 +446,7 @@
       transition: stroke-dasharray 0.85s cubic-bezier(0.22, 1, 0.36, 1), stroke-dashoffset 0.85s cubic-bezier(0.22, 1, 0.36, 1), stroke 0.6s ease;
     }
 
-    /* Filter Dropdown (direkt unter dem Filter-Icon rechts) */
+    /* Filter Dropdown */
     .filter-pop {
       position: absolute;
       top: 98px;
@@ -392,7 +476,6 @@
       align-items: center;
       justify-content: space-between;
       color: var(--text);
-      transition: background 0.3s ease, color 0.3s ease;
     }
 
     .filter-opt.selected {
@@ -417,12 +500,31 @@
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      transition: background 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease;
+      transition: background 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
     }
 
     .list-item:active {
       transform: scale(0.975);
       background: var(--card-hover);
+    }
+
+    /* Ausgegraute zukünftige Buchungen */
+    .list-item.future-entry {
+      opacity: 0.46;
+      border-style: dashed;
+    }
+
+    .pending-badge {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: var(--border);
+      color: var(--text);
+      margin-left: 5px;
     }
 
     .item-left {
@@ -473,6 +575,7 @@
       font-size: 13px;
       border: 1px dashed var(--border);
       border-radius: 16px;
+      line-height: 1.5;
     }
 
     .add-row-btn {
@@ -527,7 +630,7 @@
       font-weight: 500;
       cursor: pointer;
       padding: 6px 0;
-      transition: color 0.4s ease, transform 0.35s ease;
+      transition: color 0.4s ease;
     }
 
     .nav-btn.active {
@@ -616,7 +719,6 @@
       border-radius: 13px;
       font-size: 15px;
       outline: none;
-      transition: border-color 0.35s ease;
     }
 
     .input:focus {
@@ -631,7 +733,6 @@
       letter-spacing: -0.5px;
     }
 
-    /* Custom Designed Picker Trigger */
     .picker-trigger {
       width: 100%;
       background: var(--card);
@@ -642,11 +743,6 @@
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      transition: border-color 0.35s ease, background 0.35s ease;
-    }
-
-    .picker-trigger:active {
-      background: var(--card-hover);
     }
 
     .toggle-row {
@@ -703,11 +799,24 @@
       font-weight: 700;
       cursor: pointer;
       margin-top: 8px;
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .primary-btn:active {
       transform: scale(0.97);
+    }
+
+    .secondary-btn {
+      width: 100%;
+      background: var(--card);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 13px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
     }
 
     .delete-btn {
@@ -724,26 +833,26 @@
       display: none;
     }
 
-    /* Große Farb- und Icon-Auswahl */
+    /* 50 Farben & 50 Icons Grids */
     .swatch-grid {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 7px;
     }
 
     .swatch {
-      width: 34px;
-      height: 34px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid transparent;
       margin: 0 auto;
-      transition: transform 0.35s ease, border-color 0.35s ease;
+      transition: transform 0.25s ease, border-color 0.25s ease;
     }
 
     .swatch.selected {
       border-color: var(--text);
-      transform: scale(1.16);
+      transform: scale(1.22);
     }
 
     .icon-group-title {
@@ -751,12 +860,12 @@
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.6px;
-      margin: 12px 0 6px;
+      margin: 14px 0 6px;
     }
 
     .icon-grid {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 8px;
     }
 
@@ -770,7 +879,7 @@
       justify-content: center;
       color: var(--muted);
       cursor: pointer;
-      transition: all 0.35s ease;
+      transition: all 0.3s ease;
     }
 
     .icon-choice.selected {
@@ -780,7 +889,7 @@
       transform: scale(1.06);
     }
 
-    /* Auswertung (Aussagekräftige Karten & Balken) */
+    /* Analytics */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -893,7 +1002,7 @@
       transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    /* Onboarding Journey (Langsame, atmosphärische Reise) */
+    /* Onboarding Journey */
     .journey-stage {
       flex: 1;
       display: flex;
@@ -938,7 +1047,7 @@
       margin-top: 16px;
     }
 
-    .Preset-chip {
+    .preset-chip {
       padding: 9px 14px;
       border-radius: 99px;
       border: 1px solid var(--border);
@@ -953,7 +1062,7 @@
       transition: all 0.45s ease;
     }
 
-    .Preset-chip.selected {
+    .preset-chip.selected {
       border-color: var(--accent);
       background: var(--accent-dim);
       color: var(--text);
@@ -990,7 +1099,7 @@
       border-radius: 99px;
       font-size: 12px;
       font-weight: 700;
-      z-index: 120;
+      z-index: 150;
       transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
@@ -1001,36 +1110,48 @@
 </head>
 <body>
   <div id="appShell" class="app-shell" data-mood="neutral">
-    <div class="ambient-layer"></div>
-    <div id="toast" class="toast">Gespeichert</div>
+    <!-- SUBTILE START-LOGO-ANIMATION -->
+    <div id="splashScreen" class="splash-screen">
+      <div class="splash-logo-wrap">
+        <svg width="88" height="88" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="42" fill="none" stroke="#1F2637" stroke-width="10" />
+          <circle class="splash-ring" cx="60" cy="60" r="42" fill="none" stroke="#00D09C" stroke-width="10" stroke-linecap="round" transform="rotate(-90 60 60)" />
+          <polyline class="splash-trend" points="42,68 55,55 64,63 79,46" fill="none" stroke="#F3F5F8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="splash-title">Cashview</div>
+    </div>
 
-    <!-- TOP HEADER (Zahnrad auf jeder Seite oben rechts, Filter darunter auf Start) -->
+    <div class="ambient-layer"></div>
+    <div id="toast" class="toast">Saved</div>
+
+    <!-- TOP HEADER -->
     <div class="topbar">
       <div class="topbar-main">
         <!-- Links: Streak Counter -->
-        <div class="streak-pill" onclick="showToast(state.streak + ' Tage Fokus-Serie')">
+        <div class="streak-pill" onclick="showStreakToast()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="9" stroke="var(--border)" stroke-width="2.5"/>
             <circle cx="12" cy="12" r="9" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="56" stroke-dashoffset="14" stroke-linecap="round"/>
           </svg>
-          <span id="streakCount">1T</span>
+          <span id="streakCount">1d</span>
         </div>
 
-        <!-- Mitte: Zeitnavigation (Start/Investments/Auswertung) ODER Titel (Kategorien) -->
+        <!-- Mitte: Zeitnavigation (Start / Investments / Auswertung) ODER Titel (Kategorien) -->
         <div id="periodNavWrap" class="period-nav">
           <button class="icon-btn" style="width:28px;height:28px" onclick="shiftPeriod(-1)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
           </button>
-          <span id="periodLabel" onclick="openCustomRangeIfNeeded()" style="cursor:pointer">Oktober 2026</span>
+          <span id="periodLabel" onclick="openCustomRangeIfNeeded()" style="cursor:pointer">October 2026</span>
           <button class="icon-btn" style="width:28px;height:28px" onclick="shiftPeriod(1)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
         </div>
-        <div id="staticHeaderTitle" class="screen-header-title" style="display:none">Kategorien</div>
+        <div id="staticHeaderTitle" class="screen-header-title" style="display:none">Categories</div>
 
-        <!-- Rechts: Einstellungen-Zahnrad (Auf JEDER Seite) -->
+        <!-- Rechts: Einstellungen-Zahnrad (Auf JEDER Seite oben rechts) -->
         <div class="topbar-right">
-          <button class="icon-btn" onclick="openSettings()" title="Einstellungen">
+          <button class="icon-btn" onclick="openSettings()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="3"/>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -1039,16 +1160,16 @@
         </div>
       </div>
 
-      <!-- Zweite Zeile (Nur auf Startseite sichtbar: Zeitraum-Körnung links, Filter-Icon rechts unter Zahnrad) -->
-      <div id="homeSubBar" class="topbar-sub">
+      <!-- Zweite Zeile: Kalender-Körnung (Start, Investments, Auswertung) + Filter-Button (rechts unter Zahnrad auf Start) -->
+      <div id="calendarSubBar" class="topbar-sub">
         <div class="granularity-bar">
-          <button class="gran-btn" data-gran="day" onclick="setGranularity('day')">Tag</button>
-          <button class="gran-btn" data-gran="week" onclick="setGranularity('week')">Woche</button>
-          <button class="gran-btn active" data-gran="month" onclick="setGranularity('month')">Monat</button>
-          <button class="gran-btn" data-gran="range" onclick="setGranularity('range')">Zeitraum</button>
+          <button id="granDay" class="gran-btn" data-gran="day" onclick="setGranularity('day')">Day</button>
+          <button id="granWeek" class="gran-btn" data-gran="week" onclick="setGranularity('week')">Week</button>
+          <button id="granMonth" class="gran-btn active" data-gran="month" onclick="setGranularity('month')">Month</button>
+          <button id="granRange" class="gran-btn" data-gran="range" onclick="setGranularity('range')">Period</button>
         </div>
 
-        <button id="filterBtn" class="icon-btn" onclick="toggleFilterPop()" title="Filter">
+        <button id="filterBtn" class="icon-btn" onclick="toggleFilterPop()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
           </svg>
@@ -1056,20 +1177,20 @@
       </div>
     </div>
 
-    <!-- Filter Popover (Startseite unter dem Filter-Icon) -->
+    <!-- Filter Popover -->
     <div id="filterPop" class="filter-pop">
-      <div class="filter-opt selected" data-filter="actual" onclick="setFilter('actual')">Vermögen</div>
-      <div class="filter-opt" data-filter="income" onclick="setFilter('income')">Einnahmen</div>
-      <div class="filter-opt" data-filter="expense" onclick="setFilter('expense')">Ausgaben</div>
-      <div class="filter-opt" data-filter="loans" onclick="setFilter('loans')">Inkl. Leihen</div>
-      <div class="filter-opt" data-filter="invest" onclick="setFilter('invest')">Investitionen</div>
-      <div class="filter-opt" data-filter="all" onclick="setFilter('all')">Gesamt</div>
+      <div id="fOptActual" class="filter-opt selected" data-filter="actual" onclick="setFilter('actual')">Balance</div>
+      <div id="fOptIncome" class="filter-opt" data-filter="income" onclick="setFilter('income')">Income</div>
+      <div id="fOptExpense" class="filter-opt" data-filter="expense" onclick="setFilter('expense')">Expenses</div>
+      <div id="fOptLoans" class="filter-opt" data-filter="loans" onclick="setFilter('loans')">Incl. Loans</div>
+      <div id="fOptInvest" class="filter-opt" data-filter="invest" onclick="setFilter('invest')">Investments</div>
+      <div id="fOptAll" class="filter-opt" data-filter="all" onclick="setFilter('all')">Total</div>
     </div>
 
     <!-- 1. STARTSEITE -->
     <div id="screen-home" class="screen active">
       <div class="hero-block">
-        <div id="filterTitle" class="hero-label">Vermögen</div>
+        <div id="filterTitle" class="hero-label">Balance</div>
         <div id="homeTotal" class="hero-amount">0,00 €</div>
       </div>
 
@@ -1088,12 +1209,17 @@
       </button>
     </div>
 
-    <!-- 3. INVESTMENTS -->
+    <!-- 3. INVESTMENTS (Mit täglicher Zinsberechnung: Tag, Monat, Jahr) -->
     <div id="screen-investments" class="screen">
       <div class="hero-block">
-        <div class="hero-label">Portfolio</div>
+        <div id="invHeroLabel" class="hero-label">Portfolio</div>
         <div id="invTotal" class="hero-amount">0,00 €</div>
-        <div id="invGain" style="font-size:13px;font-weight:600;color:var(--accent);margin-top:4px;">+0,00 € (0,0%)</div>
+        <div id="invGain" style="font-size:13px;font-weight:600;color:var(--accent);margin-top:4px;">+0,00 € (0.0%)</div>
+        <div class="yield-pills">
+          <div class="yield-pill"><span id="lblYieldDay">Day</span>: <b id="valYieldDay">+0,00 €</b></div>
+          <div class="yield-pill"><span id="lblYieldMonth">Month</span>: <b id="valYieldMonth">+0,00 €</b></div>
+          <div class="yield-pill"><span id="lblYieldYear">Year</span>: <b id="valYieldYear">+0,00 €</b></div>
+        </div>
       </div>
 
       <div id="invList" class="list-group"></div>
@@ -1102,30 +1228,30 @@
       </button>
     </div>
 
-    <!-- 4. AUSWERTUNG (Konkret & Informativ) -->
+    <!-- 4. AUSWERTUNG -->
     <div id="screen-analytics" class="screen">
       <div class="kpi-grid">
         <div class="kpi-card">
-          <div class="kpi-label">Sparquote</div>
+          <div id="lblKpiSavings" class="kpi-label">Savings Rate</div>
           <div id="kpiSavingsRate" class="kpi-val" style="color:var(--accent)">0%</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Netto-Cashflow</div>
+          <div id="lblKpiNet" class="kpi-label">Net Cashflow</div>
           <div id="kpiNetCashflow" class="kpi-val">0,00 €</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Ø pro Tag (Ausgaben)</div>
+          <div id="lblKpiDaily" class="kpi-label">Ø Daily Spend</div>
           <div id="kpiDailyBurn" class="kpi-val">0,00 €</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Top-Kategorie</div>
+          <div id="lblKpiTop" class="kpi-label">Top Category</div>
           <div id="kpiTopCat" class="kpi-val" style="font-size:15px">–</div>
         </div>
       </div>
 
       <div class="chart-card">
         <div class="chart-header">
-          <span>Einnahmen vs. Ausgaben (6M)</span>
+          <span id="lblChartCashflow">Income vs. Expenses (6M)</span>
           <span id="cashflowSummaryLabel" style="color:var(--muted);font-size:11px"></span>
         </div>
         <div id="cashflowBars" class="bar-row"></div>
@@ -1133,16 +1259,16 @@
 
       <div class="chart-card">
         <div class="chart-header">
-          <span>Ausgaben nach Kategorie</span>
-          <span style="color:var(--muted);font-size:11px">Anteil</span>
+          <span id="lblChartCatBreak">Expenses by Category</span>
+          <span id="lblChartShare" style="color:var(--muted);font-size:11px">Share</span>
         </div>
         <div id="analyticsCatBreakdown"></div>
       </div>
 
       <div class="chart-card">
         <div class="chart-header">
-          <span>Investment-Projektion (Zinseszins)</span>
-          <span id="projRateHint" style="color:var(--accent);font-size:11px"></span>
+          <span id="lblChartProj">Compound Projection</span>
+          <span style="color:var(--accent);font-size:11px">1Y – 10Y</span>
         </div>
         <div id="wealthBars" class="bar-row"></div>
       </div>
@@ -1152,80 +1278,76 @@
     <div class="bottom-nav">
       <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg>
-        <span>Start</span>
+        <span id="navLblHome">Home</span>
       </button>
       <button class="nav-btn" data-tab="categories" onclick="switchTab('categories')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
-        <span>Kategorien</span>
+        <span id="navLblCategories">Categories</span>
       </button>
       <button class="nav-plus" onclick="openEntryModal()">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
       </button>
       <button class="nav-btn" data-tab="investments" onclick="switchTab('investments')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
-        <span>Investments</span>
+        <span id="navLblInvestments">Investments</span>
       </button>
       <button class="nav-btn" data-tab="analytics" onclick="switchTab('analytics')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        <span>Auswertung</span>
+        <span id="navLblAnalytics">Analytics</span>
       </button>
     </div>
 
-    <!-- MODAL: EINTRAG (+ / BEARBEITEN) -->
+    <!-- MODAL: BUCHUNG (+ / BEARBEITEN) -->
     <div id="modal-entry" class="fullscreen-modal">
       <div class="modal-header">
-        <span class="modal-title">Buchung</span>
+        <span id="entryModalTitle" class="modal-title">Entry</span>
         <button class="icon-btn" onclick="closeModals()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
 
       <div class="seg-control">
-        <div class="seg-btn active" data-etype="expense" onclick="setEntryType('expense')">Ausgabe</div>
-        <div class="seg-btn" data-etype="income" onclick="setEntryType('income')">Einnahme</div>
-        <div class="seg-btn" data-etype="loan" onclick="setEntryType('loan')">Leihe</div>
+        <div id="segBtnExpense" class="seg-btn active" data-etype="expense" onclick="setEntryType('expense')">Expense</div>
+        <div id="segBtnIncome" class="seg-btn" data-etype="income" onclick="setEntryType('income')">Income</div>
+        <div id="segBtnLoan" class="seg-btn" data-etype="loan" onclick="setEntryType('loan')">Loan</div>
       </div>
 
       <div class="field">
-        <input id="entryAmount" type="number" step="0.01" placeholder="0,00" class="input input-amount" />
+        <input id="entryAmount" type="number" step="0.01" placeholder="0.00" class="input input-amount" />
       </div>
 
-      <!-- Custom Kategorie-Auswahl (ersetzt das hässliche Standard-Select) -->
       <div class="field">
-        <label class="field-label">Kategorie</label>
+        <label id="lblEntryCategory" class="field-label">Category</label>
         <div class="picker-trigger" onclick="openCategorySheet('entry')">
-          <div class="item-left" id="entryCategoryDisplay">
-            <div class="cat-icon" style="width:28px;height:28px;background:var(--border)"></div>
-            <span style="font-size:14px;font-weight:600">Kategorie wählen</span>
-          </div>
+          <div class="item-left" id="entryCategoryDisplay"></div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
       </div>
 
       <div class="field">
-        <label class="field-label">Bezeichnung (optional)</label>
-        <input id="entryNote" type="text" placeholder="Notiz" class="input" />
+        <label id="lblEntryNote" class="field-label">Note (optional)</label>
+        <input id="entryNote" type="text" placeholder="Description" class="input" />
       </div>
 
       <div class="field">
-        <label class="field-label">Datum</label>
+        <label id="lblEntryDate" class="field-label">Date</label>
         <input id="entryDate" type="date" class="input" />
       </div>
 
       <div class="toggle-row" onclick="toggleSwitch('entryRecurring')">
-        <span>Wiederkehrend (monatlich)</span>
+        <span id="lblEntryRecurring">Recurring (monthly)</span>
         <div id="entryRecurring" class="switch"></div>
       </div>
 
-      <button class="primary-btn" onclick="saveEntry()">Speichern</button>
-      <button id="deleteEntryBtn" class="delete-btn" onclick="deleteEntry()">Löschen</button>
+      <button id="btnSaveEntry" class="primary-btn" onclick="saveEntry()">Save</button>
+      <button id="deleteEntryBtn" class="delete-btn" onclick="deleteEntry()">Delete</button>
     </div>
 
     <!-- CUSTOM BOTTOM-SHEET FÜR KATEGORIE-WAHL -->
-    <div id="categorySheet" class="sheet-backdrop" onclick="closeCategorySheet(event)">
+    <div id="categorySheet" class="sheet-backdrop" onclick="closeCategorySheet()">
       <div class="sheet-box" onclick="event.stopPropagation()">
         <div class="modal-header" style="margin-bottom:14px">
-          <span class="modal-title" style="font-size:15px">Kategorie wählen</span>
+          <span id="sheetTitleCategory" class="modal-title" style="font-size:15px">Select Category</span>
           <button class="icon-btn" style="width:28px;height:28px" onclick="closeCategorySheet()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
           </button>
@@ -1237,163 +1359,192 @@
     <!-- MODAL: INDIVIDUELLER ZEITRAUM -->
     <div id="modal-range" class="fullscreen-modal">
       <div class="modal-header">
-        <span class="modal-title">Zeitraum wählen</span>
+        <span id="rangeModalTitle" class="modal-title">Select Period</span>
         <button class="icon-btn" onclick="closeModals()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
       <div class="field">
-        <label class="field-label">Startdatum</label>
+        <label id="lblRangeStart" class="field-label">Start Date</label>
         <input id="rangeStartInput" type="date" class="input" />
       </div>
       <div class="field">
-        <label class="field-label">Enddatum</label>
+        <label id="lblRangeEnd" class="field-label">End Date</label>
         <input id="rangeEndInput" type="date" class="input" />
       </div>
-      <button class="primary-btn" onclick="applyCustomRange()">Zeitraum anwenden</button>
+      <button id="btnApplyRange" class="primary-btn" onclick="applyCustomRange()">Apply Period</button>
     </div>
 
     <!-- MODAL: KATEGORIE (+ / BEARBEITEN) -->
     <div id="modal-category" class="fullscreen-modal">
       <div class="modal-header">
-        <span class="modal-title">Kategorie</span>
+        <span id="catModalTitle" class="modal-title">Category</span>
         <button class="icon-btn" onclick="closeModals()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
 
       <div class="seg-control two">
-        <div class="seg-btn active" data-ctype="expense" onclick="setCatType('expense')">Ausgaben</div>
-        <div class="seg-btn" data-ctype="income" onclick="setCatType('income')">Einnahmen</div>
+        <div id="segCatExpense" class="seg-btn active" data-ctype="expense" onclick="setCatType('expense')">Expenses</div>
+        <div id="segCatIncome" class="seg-btn" data-ctype="income" onclick="setCatType('income')">Income</div>
       </div>
 
       <div class="field">
-        <label class="field-label">Name</label>
-        <input id="catName" type="text" placeholder="Kategoriename" class="input" />
+        <label id="lblCatName" class="field-label">Name</label>
+        <input id="catName" type="text" placeholder="Category name" class="input" />
       </div>
 
       <div class="toggle-row" onclick="toggleSubcatSwitch()">
-        <span>Subkategorie</span>
+        <span id="lblCatIsSub">Subcategory</span>
         <div id="catIsSub" class="switch"></div>
       </div>
 
       <div id="parentCatField" class="field" style="display:none">
-        <label class="field-label">Übergeordnete Kategorie</label>
+        <label id="lblCatParent" class="field-label">Parent Category</label>
         <div class="picker-trigger" onclick="openCategorySheet('parent')">
-          <div class="item-left" id="parentCategoryDisplay">
-            <span style="font-size:14px;font-weight:600">Hauptkategorie wählen</span>
-          </div>
+          <div class="item-left" id="parentCategoryDisplay"></div>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
         </div>
       </div>
 
       <div class="field">
-        <label class="field-label">Farbton</label>
+        <label id="lblCatColor" class="field-label">Color (50)</label>
         <div id="colorGrid" class="swatch-grid"></div>
       </div>
 
       <div class="field">
-        <label class="field-label">Symbol nach Themengebiet</label>
+        <label id="lblCatIcon" class="field-label">Icon by Theme (50)</label>
         <div id="iconGroupsContainer"></div>
       </div>
 
-      <button class="primary-btn" onclick="saveCategory()">Speichern</button>
-      <button id="deleteCatBtn" class="delete-btn" onclick="deleteCategory()">Löschen</button>
+      <button id="btnSaveCat" class="primary-btn" onclick="saveCategory()">Save</button>
+      <button id="deleteCatBtn" class="delete-btn" onclick="deleteCategory()">Delete</button>
     </div>
 
     <!-- MODAL: INVESTMENT (+ / BEARBEITEN) -->
     <div id="modal-investment" class="fullscreen-modal">
       <div class="modal-header">
-        <span class="modal-title">Investment</span>
+        <span id="invModalTitle" class="modal-title">Investment</span>
         <button class="icon-btn" onclick="closeModals()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
 
       <div class="field">
-        <label class="field-label">Bezeichnung</label>
-        <input id="invName" type="text" placeholder="z. B. Welt-ETF" class="input" />
+        <label id="lblInvName" class="field-label">Name</label>
+        <input id="invName" type="text" placeholder="e.g. World ETF" class="input" />
       </div>
 
       <div class="field">
-        <label class="field-label">Betrag (€)</label>
-        <input id="invAmount" type="number" step="0.01" placeholder="0,00" class="input" />
+        <label id="lblInvAmount" class="field-label">Amount (€)</label>
+        <input id="invAmount" type="number" step="0.01" placeholder="0.00" class="input" />
       </div>
 
       <div class="field">
-        <label class="field-label">Rendite / Zinssatz p.a. (%)</label>
+        <label id="lblInvRate" class="field-label">Return / Interest p.a. (%)</label>
         <input id="invRate" type="number" step="0.1" value="7.0" class="input" />
       </div>
 
       <div class="field">
-        <label class="field-label">Startdatum</label>
+        <label id="lblInvDate" class="field-label">Start Date</label>
         <input id="invDate" type="date" class="input" />
       </div>
 
       <div class="toggle-row" onclick="toggleInvRecurring()">
-        <span>Dauerauftrag (monatlich)</span>
+        <span id="lblInvRecurring">Standing Order (monthly)</span>
         <div id="invRecurring" class="switch"></div>
       </div>
 
       <div id="invDynField" class="field" style="display:none">
-        <label class="field-label">Dynamik / Inflationsanpassung p.a. (%)</label>
+        <label id="lblInvDyn" class="field-label">Dynamic / Inflation adjustment p.a. (%)</label>
         <input id="invDyn" type="number" step="0.1" value="2.0" class="input" />
       </div>
 
       <div id="invFeeToggleRow" class="toggle-row" onclick="toggleInvFee()">
-        <span>Kaufkosten</span>
+        <span id="lblInvHasFee">Purchase Costs</span>
         <div id="invHasFee" class="switch"></div>
       </div>
 
       <div id="invFeeField" class="field" style="display:none">
-        <label class="field-label">Gebühr (€)</label>
+        <label id="lblInvFee" class="field-label">Fee (€)</label>
         <input id="invFee" type="number" step="0.01" value="0.99" class="input" />
       </div>
 
-      <button class="primary-btn" onclick="saveInvestment()">Speichern</button>
-      <button id="deleteInvBtn" class="delete-btn" onclick="deleteInvestment()">Löschen</button>
+      <button id="btnSaveInv" class="primary-btn" onclick="saveInvestment()">Save</button>
+      <button id="deleteInvBtn" class="delete-btn" onclick="deleteInvestment()">Delete</button>
     </div>
 
     <!-- MODAL: EINSTELLUNGEN -->
     <div id="modal-settings" class="fullscreen-modal">
       <div class="modal-header">
-        <span class="modal-title">Einstellungen</span>
+        <span id="settingsModalTitle" class="modal-title">Settings</span>
         <button class="icon-btn" onclick="closeModals()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
         </button>
       </div>
 
+      <!-- Sprach-Auswahl (Optionen bleiben neutral in ihrer jeweiligen Landessprache!) -->
+      <div class="field">
+        <label id="lblLanguage" class="field-label">Language</label>
+        <select id="langSelect" class="input" onchange="changeLanguage(this.value)">
+          <option value="en">English</option>
+          <option value="de">Deutsch</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+        </select>
+      </div>
+
       <div class="toggle-row" onclick="toggleTheme()">
-        <span>Dunkelmodus</span>
+        <span id="lblDarkMode">Dark Mode</span>
         <div id="themeSwitch" class="switch on"></div>
       </div>
 
+      <div class="toggle-row" onclick="toggleVibration()">
+        <span id="lblVibration">Vibration / Haptics</span>
+        <div id="vibeSwitch" class="switch on"></div>
+      </div>
+
       <div class="toggle-row" onclick="toggleDailyNotification()">
-        <span>Tägliche Handy-Erinnerung</span>
+        <span id="lblDailyReminder">Daily Reminder</span>
         <div id="notifSwitch" class="switch"></div>
       </div>
 
       <div id="notifTimeField" class="field" style="display:none">
-        <label class="field-label">Erinnerungszeit</label>
+        <label id="lblReminderTime" class="field-label">Reminder Time</label>
         <input id="notifTimeInput" type="time" value="20:00" class="input" onchange="saveNotificationTime()" />
       </div>
 
       <div class="list-group" style="margin-top:12px">
         <div class="list-item" onclick="exportCSV()">
-          <span class="item-title">CSV Datenexport</span>
+          <span id="lblExportCsv" class="item-title">Export CSV</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
         </div>
         <div class="list-item" onclick="replayOnboarding()">
-          <span class="item-title">Visuelle Einführung starten</span>
+          <span id="lblReplayIntro" class="item-title">Replay Intro Journey</span>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
         </div>
         <div class="list-item" onclick="resetAllData()">
-          <span class="item-title" style="color:var(--danger)">Alle Daten zurücksetzen</span>
+          <span id="lblResetData" class="item-title" style="color:var(--danger)">Reset All Data</span>
         </div>
       </div>
     </div>
 
-    <!-- MODAL: VISUELLE EINFÜHRUNGSREISE (Beim ersten Öffnen, ohne vorgefüllte Fremddaten) -->
+    <!-- MODAL: ERINNERUNGS-FRAGE NACH DER 2. BUCHUNG -->
+    <div id="modal-notif-prompt" class="fullscreen-modal">
+      <div class="journey-stage">
+        <div class="journey-orb">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <h2 id="notifPromptTitle" style="font-size:22px;font-weight:700;margin-bottom:10px">Stay in your flow?</h2>
+        <p id="notifPromptSub" style="font-size:14px;color:var(--muted);line-height:1.6;max-width:290px;margin-bottom:20px">
+          You have logged your second entry. Would you like a gentle daily notification to keep your streak alive?
+        </p>
+        <button id="btnEnableNotifPrompt" class="primary-btn" onclick="acceptSecondEntryNotification()">Enable Daily Reminder</button>
+        <button id="btnSkipNotifPrompt" class="secondary-btn" onclick="closeModals()">Not now</button>
+      </div>
+    </div>
+
+    <!-- MODAL: VISUELLE EINFÜHRUNGSREISE (Ohne Benachrichtigungsfrage) -->
     <div id="modal-onboarding" class="fullscreen-modal">
       <div id="onboardStage" class="journey-stage"></div>
       <div id="onboardDots" class="dots"></div>
@@ -1402,98 +1553,590 @@
   </div>
 
   <script>
-    // Sortierte, umfangreiche Icon-Bibliothek im einheitlichen Linienstil
+    // VOLLSTÄNDIGES SPRACHPAKET (EN, DE, ES, FR)
+    const I18N = {
+      en: {
+        locale: 'en-US',
+        streakSuffix: 'd',
+        streakToast: 'day focus streak',
+        navHome: 'Home',
+        navCategories: 'Categories',
+        navInvestments: 'Investments',
+        navAnalytics: 'Analytics',
+        granDay: 'Day',
+        granWeek: 'Week',
+        granMonth: 'Month',
+        granRange: 'Period',
+        fActual: 'Balance',
+        fIncome: 'Income',
+        fExpense: 'Expenses',
+        fLoans: 'Incl. Loans',
+        fInvest: 'Investments',
+        fAll: 'Total',
+        emptyHome: 'No entries in this period. Tap <b>+</b> below to add one.',
+        emptyCats: 'No categories yet. Tap <b>+</b> below to create one.',
+        emptyInv: 'No investments or savings plans added yet.',
+        emptyAnalyticsCats: 'No expenses recorded in this period.',
+        pending: 'Pending',
+        recurringShort: 'Monthly',
+        savingsPlan: 'Savings Plan',
+        dynamics: 'dynamics',
+        portfolio: 'Portfolio',
+        yieldDay: 'Day',
+        yieldMonth: 'Month',
+        yieldYear: 'Year',
+        kpiSavings: 'Savings Rate',
+        kpiNet: 'Net Cashflow',
+        kpiDaily: 'Ø Daily Spend',
+        kpiTop: 'Top Category',
+        chartCashflow: 'Income vs. Expenses (6M)',
+        chartCatBreak: 'Expenses by Category',
+        chartShare: 'Share',
+        chartProj: 'Compound Projection',
+        yearShort: 'Y',
+        entryTitle: 'Entry',
+        expense: 'Expense',
+        income: 'Income',
+        loan: 'Loan',
+        expenses: 'Expenses',
+        incomes: 'Income',
+        category: 'Category',
+        chooseCategory: 'Select category',
+        chooseParent: 'Select parent category',
+        noMatchingCat: 'No matching category yet. Create one in the Categories tab first.',
+        noteOpt: 'Note (optional)',
+        notePlaceholder: 'Description',
+        date: 'Date',
+        recurringMonthly: 'Recurring (monthly)',
+        save: 'Save',
+        delete: 'Delete',
+        selectPeriod: 'Select Period',
+        startDate: 'Start Date',
+        endDate: 'End Date',
+        applyPeriod: 'Apply Period',
+        catNameLbl: 'Name',
+        catNamePlaceholder: 'Category name',
+        subcategory: 'Subcategory',
+        parentCategory: 'Parent Category',
+        colorLbl: 'Color (50)',
+        iconLbl: 'Icon by Theme (50)',
+        invTitle: 'Investment',
+        invNameLbl: 'Name',
+        invNamePlaceholder: 'e.g. World ETF',
+        invAmountLbl: 'Amount (€)',
+        invRateLbl: 'Return / Interest p.a. (%)',
+        invStandingOrder: 'Standing Order (monthly)',
+        invDynLbl: 'Dynamic / Inflation adjustment p.a. (%)',
+        invCostsToggle: 'Purchase Costs',
+        invFeeLbl: 'Fee (€)',
+        settingsTitle: 'Settings',
+        languageLbl: 'Language',
+        darkMode: 'Dark Mode',
+        vibration: 'Vibration / Haptics',
+        dailyReminder: 'Daily Reminder',
+        reminderTime: 'Reminder Time',
+        exportCsv: 'Export CSV',
+        replayIntro: 'Replay Intro Journey',
+        resetData: 'Reset All Data',
+        confirmReset: 'Reset all data and restart onboarding?',
+        toastSaved: 'Saved',
+        toastDeleted: 'Deleted',
+        toastEnterAmount: 'Please enter an amount',
+        toastSelectCat: 'Please select a category',
+        toastCsv: 'CSV exported',
+        toastNotifActive: 'Daily reminder enabled',
+        notifPromptTitle: 'Stay in your flow?',
+        notifPromptSub: 'You just logged your second entry. Would you like a gentle daily reminder on your phone?',
+        notifPromptAccept: 'Enable Daily Reminder',
+        notifPromptSkip: 'Not now',
+        onb1Title: 'Welcome to Cashview.',
+        onb1Sub: 'A calm, mathematically precise space for your balance, expenses, and compound investments.',
+        onb1Btn: 'Start Journey',
+        onb2Title: 'Choose your foundation.',
+        onb2Sub: 'Select the categories you want to start with. You can customize them anytime.',
+        onb2Btn: 'Continue',
+        onb3Title: 'Initial Balance',
+        onb3Sub: 'Optionally enter your current account balance or start clean at 0.00 €.',
+        onb3Placeholder: '0.00 € Starting balance (optional)',
+        onb3Btn: 'Open Cashview',
+        initBalanceName: 'Initial Balance',
+        preset_salary: 'Salary',
+        preset_housing: 'Housing',
+        preset_food: 'Groceries',
+        preset_mobility: 'Mobility',
+        preset_leisure: 'Leisure',
+        preset_education: 'Education',
+        g_living: 'Living & Home',
+        g_food: 'Food & Shopping',
+        g_mobility: 'Mobility & Travel',
+        g_work: 'Work & Finance',
+        g_leisure: 'Leisure & Health'
+      },
+      de: {
+        locale: 'de-DE',
+        streakSuffix: 'T',
+        streakToast: 'Tage Fokus-Serie',
+        navHome: 'Start',
+        navCategories: 'Kategorien',
+        navInvestments: 'Investments',
+        navAnalytics: 'Auswertung',
+        granDay: 'Tag',
+        granWeek: 'Woche',
+        granMonth: 'Monat',
+        granRange: 'Zeitraum',
+        fActual: 'Vermögen',
+        fIncome: 'Einnahmen',
+        fExpense: 'Ausgaben',
+        fLoans: 'Inkl. Leihen',
+        fInvest: 'Investitionen',
+        fAll: 'Gesamt',
+        emptyHome: 'Keine Buchungen in diesem Zeitraum. Tippe unten auf <b>+</b> zum Eintragen.',
+        emptyCats: 'Noch keine Kategorien angelegt. Tippe unten auf <b>+</b>.',
+        emptyInv: 'Noch keine Investments oder Sparpläne eingetragen.',
+        emptyAnalyticsCats: 'Keine Ausgaben im gewählten Zeitraum.',
+        pending: 'Ausstehend',
+        recurringShort: 'Monatlich',
+        savingsPlan: 'Sparplan',
+        dynamics: 'Dynamik',
+        portfolio: 'Portfolio',
+        yieldDay: 'Tag',
+        yieldMonth: 'Monat',
+        yieldYear: 'Jahr',
+        kpiSavings: 'Sparquote',
+        kpiNet: 'Netto-Cashflow',
+        kpiDaily: 'Ø pro Tag',
+        kpiTop: 'Top-Kategorie',
+        chartCashflow: 'Einnahmen vs. Ausgaben (6M)',
+        chartCatBreak: 'Ausgaben nach Kategorie',
+        chartShare: 'Anteil',
+        chartProj: 'Zinseszins-Projektion',
+        yearShort: 'J',
+        entryTitle: 'Buchung',
+        expense: 'Ausgabe',
+        income: 'Einnahme',
+        loan: 'Leihe',
+        expenses: 'Ausgaben',
+        incomes: 'Einnahmen',
+        category: 'Kategorie',
+        chooseCategory: 'Kategorie wählen',
+        chooseParent: 'Hauptkategorie wählen',
+        noMatchingCat: 'Noch keine passende Kategorie vorhanden. Lege zuerst eine im Reiter „Kategorien“ an.',
+        noteOpt: 'Bezeichnung (optional)',
+        notePlaceholder: 'Notiz',
+        date: 'Datum',
+        recurringMonthly: 'Wiederkehrend (monatlich)',
+        save: 'Speichern',
+        delete: 'Löschen',
+        selectPeriod: 'Zeitraum wählen',
+        startDate: 'Startdatum',
+        endDate: 'Enddatum',
+        applyPeriod: 'Zeitraum anwenden',
+        catNameLbl: 'Name',
+        catNamePlaceholder: 'Kategoriename',
+        subcategory: 'Subkategorie',
+        parentCategory: 'Übergeordnete Kategorie',
+        colorLbl: 'Farbton (50)',
+        iconLbl: 'Symbol nach Themengebiet (50)',
+        invTitle: 'Investment',
+        invNameLbl: 'Bezeichnung',
+        invNamePlaceholder: 'z. B. Welt-ETF',
+        invAmountLbl: 'Betrag (€)',
+        invRateLbl: 'Rendite / Zinssatz p.a. (%)',
+        invStandingOrder: 'Dauerauftrag (monatlich)',
+        invDynLbl: 'Dynamik / Inflationsanpassung p.a. (%)',
+        invCostsToggle: 'Kaufkosten',
+        invFeeLbl: 'Gebühr (€)',
+        settingsTitle: 'Einstellungen',
+        languageLbl: 'Sprache / Language',
+        darkMode: 'Dunkelmodus',
+        vibration: 'Vibration / Haptik',
+        dailyReminder: 'Tägliche Erinnerung',
+        reminderTime: 'Erinnerungszeit',
+        exportCsv: 'CSV Datenexport',
+        replayIntro: 'Visuelle Einführung starten',
+        resetData: 'Alle Daten zurücksetzen',
+        confirmReset: 'Alle Daten unwiderruflich zurücksetzen?',
+        toastSaved: 'Gespeichert',
+        toastDeleted: 'Gelöscht',
+        toastEnterAmount: 'Bitte Betrag eingeben',
+        toastSelectCat: 'Bitte Kategorie wählen',
+        toastCsv: 'CSV exportiert',
+        toastNotifActive: 'Tägliche Erinnerung aktiviert',
+        notifPromptTitle: 'Im Rhythmus bleiben?',
+        notifPromptSub: 'Du hast deine zweite Buchung eingetragen. Möchtest du eine dezente tägliche Erinnerung auf deinem Handy erhalten?',
+        notifPromptAccept: 'Erinnerung aktivieren',
+        notifPromptSkip: 'Später',
+        onb1Title: 'Willkommen bei Cashview.',
+        onb1Sub: 'Eine ruhige, mathematisch präzise Umgebung für dein Vermögen, deine Ausgaben und deine Investments.',
+        onb1Btn: 'Reise starten',
+        onb2Title: 'Wähle deine Grundstruktur.',
+        onb2Sub: 'Tippe die Kategorien an, mit denen du starten möchtest. Du kannst sie jederzeit frei erweitern.',
+        onb2Btn: 'Weiter',
+        onb3Title: 'Startbestand',
+        onb3Sub: 'Trage optional deinen aktuellen Kontostand ein oder starte direkt bei 0,00 €.',
+        onb3Placeholder: '0,00 € Startbetrag (optional)',
+        onb3Btn: 'Cashview öffnen',
+        initBalanceName: 'Startbestand',
+        preset_salary: 'Gehalt',
+        preset_housing: 'Wohnen',
+        preset_food: 'Lebensmittel',
+        preset_mobility: 'Mobilität',
+        preset_leisure: 'Freizeit',
+        preset_education: 'Studium & Bildung',
+        g_living: 'Wohnen & Alltag',
+        g_food: 'Essen & Konsum',
+        g_mobility: 'Mobilität & Reisen',
+        g_work: 'Beruf & Finanzen',
+        g_leisure: 'Freizeit & Gesundheit'
+      },
+      es: {
+        locale: 'es-ES',
+        streakSuffix: 'd',
+        streakToast: 'días de racha activa',
+        navHome: 'Inicio',
+        navCategories: 'Categorías',
+        navInvestments: 'Inversión',
+        navAnalytics: 'Análisis',
+        granDay: 'Día',
+        granWeek: 'Semana',
+        granMonth: 'Mes',
+        granRange: 'Periodo',
+        fActual: 'Patrimonio',
+        fIncome: 'Ingresos',
+        fExpense: 'Gastos',
+        fLoans: 'Incl. Préstamos',
+        fInvest: 'Inversiones',
+        fAll: 'Total',
+        emptyHome: 'Sin movimientos en este periodo. Toca <b>+</b> abajo para añadir.',
+        emptyCats: 'Aún no hay categorías. Toca <b>+</b> abajo para crear una.',
+        emptyInv: 'Aún no has añadido inversiones ni planes de ahorro.',
+        emptyAnalyticsCats: 'Sin gastos registrados en este periodo.',
+        pending: 'Pendiente',
+        recurringShort: 'Mensual',
+        savingsPlan: 'Plan mensual',
+        dynamics: 'dinámica',
+        portfolio: 'Cartera',
+        yieldDay: 'Día',
+        yieldMonth: 'Mes',
+        yieldYear: 'Año',
+        kpiSavings: 'Tasa de ahorro',
+        kpiNet: 'Flujo neto',
+        kpiDaily: 'Ø Gasto diario',
+        kpiTop: 'Categoría top',
+        chartCashflow: 'Ingresos vs. Gastos (6M)',
+        chartCatBreak: 'Gastos por categoría',
+        chartShare: 'Cuota',
+        chartProj: 'Proyección de interés compuesto',
+        yearShort: 'A',
+        entryTitle: 'Registro',
+        expense: 'Gasto',
+        income: 'Ingreso',
+        loan: 'Préstamo',
+        expenses: 'Gastos',
+        incomes: 'Ingresos',
+        category: 'Categoría',
+        chooseCategory: 'Elegir categoría',
+        chooseParent: 'Elegir categoría principal',
+        noMatchingCat: 'No hay categoría compatible. Crea una primero en la pestaña Categorías.',
+        noteOpt: 'Nota (opcional)',
+        notePlaceholder: 'Descripción',
+        date: 'Fecha',
+        recurringMonthly: 'Recurrente (mensual)',
+        save: 'Guardar',
+        delete: 'Eliminar',
+        selectPeriod: 'Seleccionar periodo',
+        startDate: 'Fecha de inicio',
+        endDate: 'Fecha final',
+        applyPeriod: 'Aplicar periodo',
+        catNameLbl: 'Nombre',
+        catNamePlaceholder: 'Nombre de categoría',
+        subcategory: 'Subcategoría',
+        parentCategory: 'Categoría principal',
+        colorLbl: 'Color (50)',
+        iconLbl: 'Icono por tema (50)',
+        invTitle: 'Inversión',
+        invNameLbl: 'Nombre',
+        invNamePlaceholder: 'ej. ETF Mundial',
+        invAmountLbl: 'Importe (€)',
+        invRateLbl: 'Rentabilidad / Interés anual (%)',
+        invStandingOrder: 'Aportación periódica (mensual)',
+        invDynLbl: 'Ajuste por inflación anual (%)',
+        invCostsToggle: 'Costes de compra',
+        invFeeLbl: 'Comisión (€)',
+        settingsTitle: 'Ajustes',
+        languageLbl: 'Idioma / Language',
+        darkMode: 'Modo oscuro',
+        vibration: 'Vibración / Háptica',
+        dailyReminder: 'Recordatorio diario',
+        reminderTime: 'Hora del recordatorio',
+        exportCsv: 'Exportar CSV',
+        replayIntro: 'Ver introducción',
+        resetData: 'Restablecer todos los datos',
+        confirmReset: '¿Restablecer todos los datos de forma permanente?',
+        toastSaved: 'Guardado',
+        toastDeleted: 'Eliminado',
+        toastEnterAmount: 'Introduce un importe',
+        toastSelectCat: 'Selecciona una categoría',
+        toastCsv: 'CSV exportado',
+        toastNotifActive: 'Recordatorio diario activado',
+        notifPromptTitle: '¿Mantener el hábito?',
+        notifPromptSub: 'Has añadido tu segundo registro. ¿Quieres recibir un recordatorio diario en tu móvil?',
+        notifPromptAccept: 'Activar recordatorio',
+        notifPromptSkip: 'Ahora no',
+        onb1Title: 'Bienvenido a Cashview.',
+        onb1Sub: 'Un entorno minimalista y preciso para tu patrimonio, tus gastos y tus inversiones.',
+        onb1Btn: 'Comenzar viaje',
+        onb2Title: 'Elige tu estructura.',
+        onb2Sub: 'Toca las categorías con las que quieres empezar. Puedes ampliarlas en cualquier momento.',
+        onb2Btn: 'Continuar',
+        onb3Title: 'Saldo inicial',
+        onb3Sub: 'Introduce opcionalmente tu saldo actual o empieza directamente en 0,00 €.',
+        onb3Placeholder: '0,00 € Saldo inicial (opcional)',
+        onb3Btn: 'Abrir Cashview',
+        initBalanceName: 'Saldo inicial',
+        preset_salary: 'Salario',
+        preset_housing: 'Vivienda',
+        preset_food: 'Supermercado',
+        preset_mobility: 'Movilidad',
+        preset_leisure: 'Ocio',
+        preset_education: 'Educación',
+        g_living: 'Hogar y Vida',
+        g_food: 'Comida y Compras',
+        g_mobility: 'Movilidad y Viajes',
+        g_work: 'Trabajo y Finanzas',
+        g_leisure: 'Ocio y Salud'
+      },
+      fr: {
+        locale: 'fr-FR',
+        streakSuffix: 'j',
+        streakToast: 'jours de série active',
+        navHome: 'Accueil',
+        navCategories: 'Catégories',
+        navInvestments: 'Investir',
+        navAnalytics: 'Analyse',
+        granDay: 'Jour',
+        granWeek: 'Semaine',
+        granMonth: 'Mois',
+        granRange: 'Période',
+        fActual: 'Patrimoine',
+        fIncome: 'Revenus',
+        fExpense: 'Dépenses',
+        fLoans: 'Prêts incl.',
+        fInvest: 'Investissements',
+        fAll: 'Total',
+        emptyHome: 'Aucune opération sur cette période. Appuyez sur <b>+</b> en bas.',
+        emptyCats: 'Aucune catégorie. Appuyez sur <b>+</b> pour en créer une.',
+        emptyInv: 'Aucun investissement ou plan d’épargne enregistré.',
+        emptyAnalyticsCats: 'Aucune dépense sur cette période.',
+        pending: 'En attente',
+        recurringShort: 'Mensuel',
+        savingsPlan: 'Plan mensuel',
+        dynamics: 'dynamique',
+        portfolio: 'Portefeuille',
+        yieldDay: 'Jour',
+        yieldMonth: 'Mois',
+        yieldYear: 'An',
+        kpiSavings: 'Taux d’épargne',
+        kpiNet: 'Flux net',
+        kpiDaily: 'Ø Dépense / jour',
+        kpiTop: 'Top catégorie',
+        chartCashflow: 'Revenus vs. Dépenses (6M)',
+        chartCatBreak: 'Dépenses par catégorie',
+        chartShare: 'Part',
+        chartProj: 'Projection d’intérêts composés',
+        yearShort: 'A',
+        entryTitle: 'Opération',
+        expense: 'Dépense',
+        income: 'Revenu',
+        loan: 'Prêt',
+        expenses: 'Dépenses',
+        incomes: 'Revenus',
+        category: 'Catégorie',
+        chooseCategory: 'Choisir une catégorie',
+        chooseParent: 'Choisir la catégorie parente',
+        noMatchingCat: 'Aucune catégorie correspondante. Créez-en une dans l’onglet Catégories.',
+        noteOpt: 'Note (optionnel)',
+        notePlaceholder: 'Description',
+        date: 'Date',
+        recurringMonthly: 'Récurrent (mensuel)',
+        save: 'Enregistrer',
+        delete: 'Supprimer',
+        selectPeriod: 'Choisir la période',
+        startDate: 'Date de début',
+        endDate: 'Date de fin',
+        applyPeriod: 'Appliquer la période',
+        catNameLbl: 'Nom',
+        catNamePlaceholder: 'Nom de la catégorie',
+        subcategory: 'Sous-catégorie',
+        parentCategory: 'Catégorie parente',
+        colorLbl: 'Couleur (50)',
+        iconLbl: 'Icône par thème (50)',
+        invTitle: 'Investissement',
+        invNameLbl: 'Nom',
+        invNamePlaceholder: 'ex. ETF Monde',
+        invAmountLbl: 'Montant (€)',
+        invRateLbl: 'Rendement / Intérêt p.a. (%)',
+        invStandingOrder: 'Virement permanent (mensuel)',
+        invDynLbl: 'Ajustement inflation p.a. (%)',
+        invCostsToggle: 'Frais d’achat',
+        invFeeLbl: 'Frais (€)',
+        settingsTitle: 'Paramètres',
+        languageLbl: 'Langue / Language',
+        darkMode: 'Mode sombre',
+        vibration: 'Vibration / Haptique',
+        dailyReminder: 'Rappel quotidien',
+        reminderTime: 'Heure du rappel',
+        exportCsv: 'Exporter CSV',
+        replayIntro: 'Revoir l’introduction',
+        resetData: 'Réinitialiser les données',
+        confirmReset: 'Réinitialiser définitivement toutes les données ?',
+        toastSaved: 'Enregistré',
+        toastDeleted: 'Supprimé',
+        toastEnterAmount: 'Veuillez saisir un montant',
+        toastSelectCat: 'Veuillez choisir une catégorie',
+        toastCsv: 'CSV exporté',
+        toastNotifActive: 'Rappel quotidien activé',
+        notifPromptTitle: 'Garder le rythme ?',
+        notifPromptSub: 'Vous venez d’ajouter votre deuxième opération. Souhaitez-vous un discret rappel quotidien ?',
+        notifPromptAccept: 'Activer le rappel',
+        notifPromptSkip: 'Plus tard',
+        onb1Title: 'Bienvenue sur Cashview.',
+        onb1Sub: 'Un espace minimaliste et précis pour votre patrimoine, vos dépenses et vos investissements.',
+        onb1Btn: 'Commencer',
+        onb2Title: 'Choisissez vos bases.',
+        onb2Sub: 'Sélectionnez les catégories de départ. Vous pourrez les modifier à tout moment.',
+        onb2Btn: 'Continuer',
+        onb3Title: 'Solde initial',
+        onb3Sub: 'Saisissez votre solde actuel ou démarrez directement à 0,00 €.',
+        onb3Placeholder: '0,00 € Solde initial (optionnel)',
+        onb3Btn: 'Ouvrir Cashview',
+        initBalanceName: 'Solde initial',
+        preset_salary: 'Salaire',
+        preset_housing: 'Logement',
+        preset_food: 'Courses',
+        preset_mobility: 'Mobilité',
+        preset_leisure: 'Loisirs',
+        preset_education: 'Études & Formation',
+        g_living: 'Maison & Quotidien',
+        g_food: 'Alimentation & Achats',
+        g_mobility: 'Mobilité & Voyages',
+        g_work: 'Travail & Finances',
+        g_leisure: 'Loisirs & Santé'
+      }
+    };
+
+    // 50 KURATIERTE FARBEN
+    const COLORS = [
+      '#00D09C','#10B981','#14B8A6','#06B6D4','#0EA5E9','#3B82F6','#6366F1','#8B5CF6','#A855F7','#D946EF',
+      '#EC4899','#F43F5E','#EF4444','#F97316','#F59E0B','#EAB308','#84CC16','#22C55E','#059669','#0D9488',
+      '#0891B2','#0284C7','#2563EB','#4F46E5','#7C3AED','#9333EA','#C026D3','#DB2777','#E11D48','#DC2626',
+      '#EA580C','#D97706','#CA8A04','#65A30D','#16A34A','#34D399','#2DD4BF','#38BDF8','#60A5FA','#818CF8',
+      '#A78BFA','#E879F9','#F472B6','#FB7185','#FBBF24','#A3E635','#64748B','#94A3B8','#475569','#334155'
+    ];
+
+    // 50 MINIMALISTISCHE ICONS (5 Themengebiete à 10 Icons)
     const ICON_GROUPS = {
-      'Wohnen & Alltag': {
+      g_living: {
         home: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+        key: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3"/></svg>',
         bolt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
         wifi: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1"/></svg>',
-        key: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3"/></svg>',
         couch: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="8" width="16" height="8" rx="2"/><path d="M2 12v4h20v-4M6 16v3M18 16v3"/></svg>',
-        tool: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>'
+        tool: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+        droplet: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>',
+        flame: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>',
+        lamp: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2h8l4 10H4L8 2z"/><path d="M12 12v6"/><path d="M8 22h8"/></svg>',
+        trash: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>'
       },
-      'Essen & Konsum': {
+      g_food: {
         cart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
         coffee: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>',
-        utensils: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
+        utensils: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/></svg>',
         bag: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>',
         gift: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/></svg>',
-        shirt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>'
+        shirt: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>',
+        wine: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 22h8"/><path d="M12 15v7"/><path d="M6 3h12l-1 7a5 5 0 0 1-10 0L6 3z"/></svg>',
+        pizza: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 19.5C5 21 8.5 22 12 22s7-1 10-2.5L12 2z"/><circle cx="12" cy="14" r="1"/><circle cx="9" cy="17" r="1"/><circle cx="15" cy="17" r="1"/></svg>',
+        apple: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 6c-3.5 0-6 2.5-6 6.5 0 4.5 3.5 8.5 6 8.5s6-4 6-8.5C18 8.5 15.5 6 12 6z"/><path d="M12 6V3c1.5 0 3 1 3 2.5"/></svg>',
+        tag: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7-7A2 2 0 0 0 12 6H4a2 2 0 0 0-2 2v8a2 2 0 0 0 .59 1.41l7 7a2 2 0 0 0 2.83 0l7-7a2 2 0 0 0 0-2.82z"/><circle cx="7.5" cy="10.5" r="1"/></svg>'
       },
-      'Mobilität & Reisen': {
+      g_mobility: {
         car: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="8" rx="2"/><path d="M5 11l2-5h10l2 5"/><circle cx="7.5" cy="15.5" r="1.5"/><circle cx="16.5" cy="15.5" r="1.5"/></svg>',
         train: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="15" rx="2"/><path d="M4 11h16M8 18l-2 3M16 18l2 3"/><circle cx="9" cy="15" r="1"/><circle cx="15" cy="15" r="1"/></svg>',
         bike: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5V14l-3-3 4-3 2 3h2"/></svg>',
         plane: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.8 19.2L16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>',
-        fuel: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="12" height="18" rx="2"/><path d="M15 7h2a2 2 0 0 1 2 2v7a2 2 0 0 0 2 2v0a2 2 0 0 0 2-2V9l-3-3"/><line x1="6" y1="8" x2="12" y2="8"/></svg>',
-        compass: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>'
+        fuel: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="12" height="18" rx="2"/><path d="M15 7h2a2 2 0 0 1 2 2v7a2 2 0 0 0 2 2 2 2 0 0 0 2-2V9l-3-3"/><line x1="6" y1="8" x2="12" y2="8"/></svg>',
+        compass: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
+        map: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>',
+        ship: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 .6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-9-4-9 4c0 2.9.94 5.34 2.81 7.76"/><path d="M12 2v8"/></svg>',
+        bus: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><line x1="3" y1="11" x2="21" y2="11"/><circle cx="7.5" cy="15" r="1"/><circle cx="16.5" cy="15" r="1"/></svg>',
+        luggage: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="7" width="12" height="14" rx="2"/><path d="M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"/></svg>'
       },
-      'Beruf & Finanzen': {
+      g_work: {
         work: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>',
         wallet: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>',
         trend: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>',
         shield: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
         bank: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 22 7 12 2"/><line x1="6" y1="10" x2="6" y2="17"/><line x1="10" y1="10" x2="10" y2="17"/><line x1="14" y1="10" x2="14" y2="17"/><line x1="18" y1="10" x2="18" y2="17"/><line x1="3" y1="20" x2="21" y2="20"/></svg>',
-        award: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>'
+        award: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
+        card: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>',
+        coins: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="6"/><path d="M15 9a6 6 0 1 1-6 6"/></svg>',
+        percent: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>',
+        chart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>'
       },
-      'Freizeit, Bildung & Gesundheit': {
+      g_leisure: {
         heart: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
         book: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
         music: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
         dumbbell: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M3 10l7-7M14 21l7-7"/></svg>',
         laptop: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><line x1="2" y1="20" x2="22" y2="20"/></svg>',
-        film: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>'
+        film: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>',
+        camera: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+        gamepad: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4"/><circle cx="15" cy="11" r="1"/><circle cx="17" cy="13" r="1"/></svg>',
+        sun: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>',
+        paw: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="16" r="4"/><circle cx="7" cy="10" r="2"/><circle cx="17" cy="10" r="2"/><circle cx="10" cy="6" r="2"/><circle cx="14" cy="6" r="2"/></svg>'
       }
     };
 
     const ICONS = {};
     Object.values(ICON_GROUPS).forEach(group => Object.assign(ICONS, group));
 
-    // 18 kuratierte Farben
-    const COLORS = [
-      '#00D09C', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9', '#3B82F6',
-      '#6366F1', '#8B5CF6', '#A855F7', '#D946EF', '#EC4899', '#F43F5E',
-      '#EF4444', '#F97316', '#F59E0B', '#EAB308', '#84CC16', '#64748B'
-    ];
-
-    const MONTHS = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-
     const STARTER_PRESETS = [
-      { key: 'salary', name: 'Gehalt', type: 'income', color: '#00D09C', icon: 'work' },
-      { key: 'housing', name: 'Wohnen', type: 'expense', color: '#3B82F6', icon: 'home' },
-      { key: 'food', name: 'Lebensmittel', type: 'expense', color: '#8B5CF6', icon: 'cart' },
-      { key: 'mobility', name: 'Mobilität', type: 'expense', color: '#F59E0B', icon: 'train' },
-      { key: 'leisure', name: 'Freizeit', type: 'expense', color: '#EC4899', icon: 'coffee' },
-      { key: 'education', name: 'Studium & Bildung', type: 'expense', color: '#06B6D4', icon: 'book' }
+      { key: 'salary', type: 'income', color: '#00D09C', icon: 'work' },
+      { key: 'housing', type: 'expense', color: '#3B82F6', icon: 'home' },
+      { key: 'food', type: 'expense', color: '#8B5CF6', icon: 'cart' },
+      { key: 'mobility', type: 'expense', color: '#F59E0B', icon: 'train' },
+      { key: 'leisure', type: 'expense', color: '#EC4899', icon: 'coffee' },
+      { key: 'education', type: 'expense', color: '#06B6D4', icon: 'book' }
     ];
 
     function getTodayISO() {
       const d = new Date();
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}-${m}-${day}`;
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     }
 
-    // Standardmäßig komplett OHNE vorgefüllte Fremdbuchungen!
     const defaultState = {
+      lang: 'en', // Standardmäßig beim ersten Start auf Englisch!
+      theme: 'dark',
+      vibrate: true,
       cursorDate: getTodayISO(),
-      granularity: 'month', // 'day' | 'week' | 'month' | 'range'
+      granularity: 'month',
       customStart: getTodayISO(),
       customEnd: getTodayISO(),
-      filter: 'actual', // 'actual' | 'income' | 'expense' | 'loans' | 'invest' | 'all'
+      filter: 'actual',
       onboarded: false,
       streak: 1,
       lastActiveDate: getTodayISO(),
       notifEnabled: false,
       notifTime: '20:00',
+      notifPromptShown: false,
       lastNotifDate: '',
       categories: [],
       entries: [],
       investments: []
     };
 
-    let state = JSON.parse(localStorage.getItem('finanzos_v4')) || defaultState;
+    let state = Object.assign({}, defaultState, JSON.parse(localStorage.getItem('cashview_v1')) || {});
 
     let currentTab = 'home';
     let editingEntryId = null;
@@ -1509,24 +2152,36 @@
     let onboardStep = 0;
     let selectedStarterKeys = ['salary', 'housing', 'food', 'mobility'];
 
+    function t(key) {
+      const dict = I18N[state.lang] || I18N.en;
+      return dict[key] || I18N.en[key] || key;
+    }
+
     function saveState() {
-      localStorage.setItem('finanzos_v4', JSON.stringify(state));
+      localStorage.setItem('cashview_v1', JSON.stringify(state));
     }
 
     function haptic() {
-      if (navigator.vibrate) navigator.vibrate(12);
+      if (state.vibrate && navigator.vibrate) {
+        navigator.vibrate(12);
+      }
     }
 
     function showToast(msg) {
       haptic();
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2200);
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    function showStreakToast() {
+      showToast(`${state.streak} ${t('streakToast')}`);
     }
 
     function formatEUR(val) {
-      return val.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+      const loc = (I18N[state.lang] || I18N.en).locale;
+      return val.toLocaleString(loc, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
     }
 
     function shadeColor(hex, percent) {
@@ -1545,22 +2200,128 @@
       return parent ? shadeColor(parent.color, 26) : cat.color;
     }
 
-    // Berechnet Start- und Enddatum je nach gewählter Körnung (Tag, Woche, Monat, Zeitraum)
+    // Aktualisiert ALLE statischen Texte in allen Fenstern und Menüs
+    function applyLanguageTexts() {
+      document.documentElement.lang = state.lang;
+      document.getElementById('navLblHome').textContent = t('navHome');
+      document.getElementById('navLblCategories').textContent = t('navCategories');
+      document.getElementById('navLblInvestments').textContent = t('navInvestments');
+      document.getElementById('navLblAnalytics').textContent = t('navAnalytics');
+      document.getElementById('staticHeaderTitle').textContent = t('navCategories');
+
+      document.getElementById('granDay').textContent = t('granDay');
+      document.getElementById('granWeek').textContent = t('granWeek');
+      document.getElementById('granMonth').textContent = t('granMonth');
+      document.getElementById('granRange').textContent = t('granRange');
+
+      document.getElementById('fOptActual').textContent = t('fActual');
+      document.getElementById('fOptIncome').textContent = t('fIncome');
+      document.getElementById('fOptExpense').textContent = t('fExpense');
+      document.getElementById('fOptLoans').textContent = t('fLoans');
+      document.getElementById('fOptInvest').textContent = t('fInvest');
+      document.getElementById('fOptAll').textContent = t('fAll');
+
+      document.getElementById('invHeroLabel').textContent = t('portfolio');
+      document.getElementById('lblYieldDay').textContent = t('yieldDay');
+      document.getElementById('lblYieldMonth').textContent = t('yieldMonth');
+      document.getElementById('lblYieldYear').textContent = t('yieldYear');
+
+      document.getElementById('lblKpiSavings').textContent = t('kpiSavings');
+      document.getElementById('lblKpiNet').textContent = t('kpiNet');
+      document.getElementById('lblKpiDaily').textContent = t('kpiDaily');
+      document.getElementById('lblKpiTop').textContent = t('kpiTop');
+      document.getElementById('lblChartCashflow').textContent = t('chartCashflow');
+      document.getElementById('lblChartCatBreak').textContent = t('chartCatBreak');
+      document.getElementById('lblChartShare').textContent = t('chartShare');
+      document.getElementById('lblChartProj').textContent = t('chartProj');
+
+      document.getElementById('entryModalTitle').textContent = t('entryTitle');
+      document.getElementById('segBtnExpense').textContent = t('expense');
+      document.getElementById('segBtnIncome').textContent = t('income');
+      document.getElementById('segBtnLoan').textContent = t('loan');
+      document.getElementById('lblEntryCategory').textContent = t('category');
+      document.getElementById('lblEntryNote').textContent = t('noteOpt');
+      document.getElementById('entryNote').placeholder = t('notePlaceholder');
+      document.getElementById('lblEntryDate').textContent = t('date');
+      document.getElementById('lblEntryRecurring').textContent = t('recurringMonthly');
+      document.getElementById('btnSaveEntry').textContent = t('save');
+      document.getElementById('deleteEntryBtn').textContent = t('delete');
+      document.getElementById('sheetTitleCategory').textContent = t('chooseCategory');
+
+      document.getElementById('rangeModalTitle').textContent = t('selectPeriod');
+      document.getElementById('lblRangeStart').textContent = t('startDate');
+      document.getElementById('lblRangeEnd').textContent = t('endDate');
+      document.getElementById('btnApplyRange').textContent = t('applyPeriod');
+
+      document.getElementById('catModalTitle').textContent = t('category');
+      document.getElementById('segCatExpense').textContent = t('expenses');
+      document.getElementById('segCatIncome').textContent = t('incomes');
+      document.getElementById('lblCatName').textContent = t('catNameLbl');
+      document.getElementById('catName').placeholder = t('catNamePlaceholder');
+      document.getElementById('lblCatIsSub').textContent = t('subcategory');
+      document.getElementById('lblCatParent').textContent = t('parentCategory');
+      document.getElementById('lblCatColor').textContent = t('colorLbl');
+      document.getElementById('lblCatIcon').textContent = t('iconLbl');
+      document.getElementById('btnSaveCat').textContent = t('save');
+      document.getElementById('deleteCatBtn').textContent = t('delete');
+
+      document.getElementById('invModalTitle').textContent = t('invTitle');
+      document.getElementById('lblInvName').textContent = t('invNameLbl');
+      document.getElementById('invName').placeholder = t('invNamePlaceholder');
+      document.getElementById('lblInvAmount').textContent = t('invAmountLbl');
+      document.getElementById('lblInvRate').textContent = t('invRateLbl');
+      document.getElementById('lblInvDate').textContent = t('startDate');
+      document.getElementById('lblInvRecurring').textContent = t('invStandingOrder');
+      document.getElementById('lblInvDyn').textContent = t('invDynLbl');
+      document.getElementById('lblInvHasFee').textContent = t('invCostsToggle');
+      document.getElementById('lblInvFee').textContent = t('invFeeLbl');
+      document.getElementById('btnSaveInv').textContent = t('save');
+      document.getElementById('deleteInvBtn').textContent = t('delete');
+
+      document.getElementById('settingsModalTitle').textContent = t('settingsTitle');
+      document.getElementById('lblLanguage').textContent = t('languageLbl');
+      document.getElementById('lblDarkMode').textContent = t('darkMode');
+      document.getElementById('lblVibration').textContent = t('vibration');
+      document.getElementById('lblDailyReminder').textContent = t('dailyReminder');
+      document.getElementById('lblReminderTime').textContent = t('reminderTime');
+      document.getElementById('lblExportCsv').textContent = t('exportCsv');
+      document.getElementById('lblReplayIntro').textContent = t('replayIntro');
+      document.getElementById('lblResetData').textContent = t('resetData');
+
+      document.getElementById('notifPromptTitle').textContent = t('notifPromptTitle');
+      document.getElementById('notifPromptSub').textContent = t('notifPromptSub');
+      document.getElementById('btnEnableNotifPrompt').textContent = t('notifPromptAccept');
+      document.getElementById('btnSkipNotifPrompt').textContent = t('notifPromptSkip');
+
+      document.getElementById('langSelect').value = state.lang;
+    }
+
+    function changeLanguage(newLang) {
+      haptic();
+      state.lang = newLang;
+      applyLanguageTexts();
+      if (document.getElementById('modal-onboarding').classList.contains('open')) {
+        renderOnboarding();
+      }
+      renderAll();
+    }
+
     function getPeriodBounds() {
+      const loc = (I18N[state.lang] || I18N.en).locale;
       const cur = new Date(state.cursorDate + 'T12:00:00');
       if (state.granularity === 'day') {
         const iso = state.cursorDate;
-        const label = cur.toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: 'numeric' });
+        const label = cur.toLocaleDateString(loc, { day: '2-digit', month: 'short', year: 'numeric' });
         return { start: iso, end: iso, label };
       }
       if (state.granularity === 'week') {
-        const dayOfWeek = (cur.getDay() + 6) % 7; // Montag = 0
+        const dayOfWeek = (cur.getDay() + 6) % 7;
         const mon = new Date(cur);
         mon.setDate(cur.getDate() - dayOfWeek);
         const sun = new Date(mon);
         sun.setDate(mon.getDate() + 6);
         const toISO = d => d.toISOString().split('T')[0];
-        const label = `${mon.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} – ${sun.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}`;
+        const label = `${mon.toLocaleDateString(loc, { day: '2-digit', month: '2-digit' })} – ${sun.toLocaleDateString(loc, { day: '2-digit', month: '2-digit' })}`;
         return { start: toISO(mon), end: toISO(sun), label };
       }
       if (state.granularity === 'range') {
@@ -1568,16 +2329,16 @@
         const e = state.customEnd >= state.customStart ? state.customEnd : state.customStart;
         const sd = new Date(s + 'T12:00:00');
         const ed = new Date(e + 'T12:00:00');
-        const label = `${sd.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} – ${ed.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}`;
+        const label = `${sd.toLocaleDateString(loc, { day: '2-digit', month: '2-digit' })} – ${ed.toLocaleDateString(loc, { day: '2-digit', month: '2-digit' })}`;
         return { start: s, end: e, label };
       }
-      // Standard: Monat
       const y = cur.getFullYear();
       const m = cur.getMonth();
       const first = `${y}-${String(m + 1).padStart(2, '0')}-01`;
       const lastDay = new Date(y, m + 1, 0).getDate();
       const last = `${y}-${String(m + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-      return { start: first, end: last, label: `${MONTHS[m]} ${y}` };
+      const monthName = cur.toLocaleDateString(loc, { month: 'long', year: 'numeric' });
+      return { start: first, end: last, label: monthName.charAt(0).toUpperCase() + monthName.slice(1) };
     }
 
     function shiftPeriod(dir) {
@@ -1601,9 +2362,7 @@
       haptic();
       state.granularity = g;
       document.querySelectorAll('.gran-btn').forEach(b => b.classList.toggle('active', b.dataset.gran === g));
-      if (g === 'range') {
-        openCustomRangeIfNeeded();
-      }
+      if (g === 'range') openCustomRangeIfNeeded();
       renderAll();
     }
 
@@ -1621,7 +2380,7 @@
       renderAll();
     }
 
-    // WICHTIG: Daueraufträge werden erst gebucht, wenn der eingestellte Tag tatsächlich erreicht ist (<= Heute)!
+    // Liefert sowohl bereits ausgeführte (<= heute) als auch zukünftige (> heute, isPending: true) Buchungen im Zeitraum
     function getEntriesInWindow(startISO, endISO) {
       const todayISO = getTodayISO();
       const results = [];
@@ -1629,25 +2388,22 @@
       state.entries.forEach(e => {
         if (!e.recurring) {
           if (e.date >= startISO && e.date <= endISO) {
-            results.push({ ...e, occDate: e.date });
+            results.push({ ...e, occDate: e.date, isPending: e.date > todayISO });
           }
         } else {
-          // Monatliche Wiederholungen ab e.date erzeugen, aber NUR bis maximal heute (todayISO)
           const orig = new Date(e.date + 'T12:00:00');
           const origDay = orig.getDate();
           let y = orig.getFullYear();
           let m = orig.getMonth();
 
-          for (let i = 0; i < 120; i++) {
+          for (let i = 0; i < 240; i++) {
             const maxDay = new Date(y, m + 1, 0).getDate();
             const day = Math.min(origDay, maxDay);
             const occISO = `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-
-            // Liegt der Ausführungstag in der Zukunft (> heute), wird er noch NICHT eingetragen!
-            if (occISO > todayISO || occISO > endISO) break;
+            if (occISO > endISO) break;
 
             if (occISO >= startISO && occISO >= e.date) {
-              results.push({ ...e, occDate: occISO });
+              results.push({ ...e, occDate: occISO, isPending: occISO > todayISO });
             }
 
             m++;
@@ -1659,21 +2415,25 @@
       return results.sort((a, b) => b.occDate.localeCompare(a.occDate));
     }
 
-    // Investment-Berechnung: Daueraufträge führen Raten nur bis zum heutigen Stichtag aus
+    // Tägliche Zinsberechnung für Investments bis zum gewählten Zeitraum-Ende (inkl. Tages-, Monats- und Jahresertrag)
     function calcInvestmentsUpTo(endISO) {
       const todayISO = getTodayISO();
-      const effectiveCutISO = endISO < todayISO ? endISO : todayISO;
-      const cutDate = new Date(effectiveCutISO + 'T12:00:00');
+      const cutDate = new Date(endISO + 'T12:00:00');
 
       let invested = 0;
       let value = 0;
+      let dailyYield = 0;
+      let monthlyYield = 0;
+      let yearlyYield = 0;
       const items = [];
 
       state.investments.forEach(inv => {
-        if (inv.date > effectiveCutISO) return;
+        if (inv.date > endISO) return;
         const startD = new Date(inv.date + 'T12:00:00');
         const origDay = startD.getDate();
-        const rDay = Math.pow(1 + (inv.rate || 0) / 100, 1 / 365) - 1;
+        const annualRate = (inv.rate || 0) / 100;
+        const rDay = Math.pow(1 + annualRate, 1 / 365) - 1;
+        const isPending = inv.date > todayISO;
 
         let itemIn = 0;
         let itemVal = 0;
@@ -1690,7 +2450,7 @@
             const maxDay = new Date(y, m + 1, 0).getDate();
             const d = Math.min(origDay, maxDay);
             const occISO = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-            if (occISO > effectiveCutISO) break;
+            if (occISO > endISO) break;
 
             const occDate = new Date(occISO + 'T12:00:00');
             const yearsPassed = Math.floor(k / 12);
@@ -1706,20 +2466,27 @@
           }
         }
 
+        const itemDaily = itemVal * rDay;
+        const itemYearly = itemVal * annualRate;
+        const itemMonthly = itemYearly / 12;
+
         invested += itemIn;
         value += itemVal;
-        items.push({ ...inv, itemIn, itemVal });
+        dailyYield += itemDaily;
+        monthlyYield += itemMonthly;
+        yearlyYield += itemYearly;
+
+        items.push({ ...inv, itemIn, itemVal, itemDaily, isPending });
       });
 
-      return { invested, value, items };
+      return { invested, value, dailyYield, monthlyYield, yearlyYield, items };
     }
 
     function renderHome() {
       const bounds = getPeriodBounds();
       document.getElementById('periodLabel').textContent = bounds.label;
-      document.getElementById('streakCount').textContent = `${state.streak}T`;
+      document.getElementById('streakCount').textContent = `${state.streak}${t('streakSuffix')}`;
 
-      // Atmosphärische Stimmung (Einnahmen = Smaragd-Futuristisch, Ausgaben = Ruhiges Rubinrot)
       const shell = document.getElementById('appShell');
       if (currentTab === 'home' && state.filter === 'income') {
         shell.setAttribute('data-mood', 'income');
@@ -1730,10 +2497,12 @@
       }
 
       const entries = getEntriesInWindow(bounds.start, bounds.end);
+      // Nur bereits fällige Buchungen (!isPending) zählen in das aktuelle Ist-Vermögen
+      const realizedEntries = entries.filter(e => !e.isPending);
       const invData = calcInvestmentsUpTo(bounds.end);
 
       let income = 0, expense = 0, loans = 0;
-      entries.forEach(e => {
+      realizedEntries.forEach(e => {
         if (e.type === 'income') income += e.amount;
         if (e.type === 'expense') expense += e.amount;
         if (e.type === 'loan') loans += e.amount;
@@ -1743,12 +2512,12 @@
       let displayedTotal = actualCash;
 
       const titles = {
-        actual: 'Vermögen',
-        income: 'Einnahmen',
-        expense: 'Ausgaben',
-        loans: 'Inkl. Leihen',
-        invest: 'Investitionen',
-        all: 'Gesamt'
+        actual: t('fActual'),
+        income: t('fIncome'),
+        expense: t('fExpense'),
+        loans: t('fLoans'),
+        invest: t('fInvest'),
+        all: t('fAll')
       };
       document.getElementById('filterTitle').textContent = titles[state.filter];
 
@@ -1760,11 +2529,10 @@
 
       document.getElementById('homeTotal').textContent = formatEUR(displayedTotal);
 
-      // Kreisdiagramm-Segmente je nach Filter
       const slices = [];
       if (state.filter !== 'invest') {
         const grouped = {};
-        entries.forEach(e => {
+        realizedEntries.forEach(e => {
           if (state.filter === 'actual' && e.type === 'loan') return;
           if (state.filter === 'income' && e.type !== 'income') return;
           if (state.filter === 'expense' && e.type !== 'expense') return;
@@ -1783,7 +2551,6 @@
 
       renderDonut(slices);
 
-      // Transaktionsliste
       const listEl = document.getElementById('homeList');
       listEl.innerHTML = '';
 
@@ -1796,23 +2563,27 @@
       });
 
       if (filteredEntries.length === 0 && state.filter !== 'invest') {
-        listEl.innerHTML = `<div class="empty-hint">Keine Buchungen in diesem Zeitraum. Tippe unten auf <b>+</b> zum Eintragen.</div>`;
+        listEl.innerHTML = `<div class="empty-hint">${t('emptyHome')}</div>`;
         return;
       }
 
+      const loc = (I18N[state.lang] || I18N.en).locale;
       filteredEntries.forEach(e => {
         const cat = state.categories.find(c => c.id === e.categoryId);
         const color = getCatColor(cat);
         const sign = e.type === 'income' ? '+' : e.type === 'expense' ? '-' : '⇄ ';
         const row = document.createElement('div');
-        row.className = 'list-item';
+        row.className = 'list-item' + (e.isPending ? ' future-entry' : '');
         row.onclick = () => openEntryModal(e.id);
+        const dateStr = new Date(e.occDate + 'T12:00:00').toLocaleDateString(loc, { day: '2-digit', month: '2-digit' });
+        const pendingHtml = e.isPending ? `<span class="pending-badge">${t('pending')}</span>` : '';
+
         row.innerHTML = `
           <div class="item-left">
             <div class="cat-icon" style="background:${color}">${ICONS[cat?.icon || 'home']}</div>
             <div>
-              <div class="item-title">${e.note || cat?.name || 'Buchung'}</div>
-              <div class="item-sub">${cat?.name || 'Kategorie'} · ${new Date(e.occDate + 'T12:00:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })}${e.recurring ? ' · Dauerauftrag' : ''}</div>
+              <div class="item-title">${e.note || cat?.name || t('entryTitle')}${pendingHtml}</div>
+              <div class="item-sub">${cat?.name || ''} · ${dateStr}${e.recurring ? ` · ${t('recurringShort')}` : ''}</div>
             </div>
           </div>
           <div class="item-amount ${e.type === 'income' ? 'pos' : 'neg'}">${sign}${formatEUR(e.amount)}</div>
@@ -1865,7 +2636,7 @@
       const list = document.getElementById('catList');
       list.innerHTML = '';
       if (state.categories.length === 0) {
-        list.innerHTML = `<div class="empty-hint">Noch keine Kategorien angelegt. Tippe unten auf <b>+</b>.</div>`;
+        list.innerHTML = `<div class="empty-hint">${t('emptyCats')}</div>`;
         return;
       }
 
@@ -1887,7 +2658,7 @@
           <div class="cat-icon" style="background:${getCatColor(cat)}">${ICONS[cat.icon || 'home']}</div>
           <div class="item-title">${cat.name}</div>
         </div>
-        <div class="item-sub" style="font-weight:700;color:${cat.type === 'income' ? 'var(--accent)' : 'var(--muted)'}">${cat.type === 'income' ? 'Einnahmen' : 'Ausgaben'}</div>
+        <div class="item-sub" style="font-weight:700;color:${cat.type === 'income' ? 'var(--accent)' : 'var(--muted)'}">${cat.type === 'income' ? t('incomes') : t('expenses')}</div>
       `;
       return row;
     }
@@ -1901,26 +2672,32 @@
       document.getElementById('invTotal').textContent = formatEUR(data.value);
       document.getElementById('invGain').textContent = `${gain >= 0 ? '+' : ''}${formatEUR(gain)} (${pct.toFixed(1)}%)`;
 
+      document.getElementById('valYieldDay').textContent = `+${formatEUR(data.dailyYield)}`;
+      document.getElementById('valYieldMonth').textContent = `+${formatEUR(data.monthlyYield)}`;
+      document.getElementById('valYieldYear').textContent = `+${formatEUR(data.yearlyYield)}`;
+
       const list = document.getElementById('invList');
       list.innerHTML = '';
       if (data.items.length === 0) {
-        list.innerHTML = `<div class="empty-hint">Noch keine Investments oder Sparpläne eingetragen.</div>`;
+        list.innerHTML = `<div class="empty-hint">${t('emptyInv')}</div>`;
         return;
       }
 
       data.items.forEach(it => {
         const diff = it.itemVal - it.itemIn;
         const row = document.createElement('div');
-        row.className = 'list-item';
+        row.className = 'list-item' + (it.isPending ? ' future-entry' : '');
         row.onclick = () => openInvestmentModal(it.id);
+        const pendingHtml = it.isPending ? `<span class="pending-badge">${t('pending')}</span>` : '';
+
         row.innerHTML = `
           <div class="item-left">
             <div class="cat-icon" style="background:var(--accent-dim);color:var(--accent)">
               ${ICONS.trend}
             </div>
             <div>
-              <div class="item-title">${it.name}</div>
-              <div class="item-sub">${it.rate}% p.a.${it.recurring ? ` · Sparplan (+${it.dyn || 0}% Dynamik)` : ''}</div>
+              <div class="item-title">${it.name}${pendingHtml}</div>
+              <div class="item-sub">${it.rate}% p.a. · +${formatEUR(it.itemDaily)}/${t('yieldDay').toLowerCase()}${it.recurring ? ` · ${t('savingsPlan')}` : ''}</div>
             </div>
           </div>
           <div>
@@ -1933,8 +2710,9 @@
     }
 
     function renderAnalytics() {
+      const loc = (I18N[state.lang] || I18N.en).locale;
       const bounds = getPeriodBounds();
-      const entries = getEntriesInWindow(bounds.start, bounds.end);
+      const entries = getEntriesInWindow(bounds.start, bounds.end).filter(e => !e.isPending);
 
       let inc = 0, exp = 0;
       const byCat = {};
@@ -1958,7 +2736,7 @@
       Object.keys(byCat).forEach(cid => {
         if (byCat[cid] > topCatVal) {
           topCatVal = byCat[cid];
-          topCatName = state.categories.find(c => c.id === cid)?.name || 'Sonstiges';
+          topCatName = state.categories.find(c => c.id === cid)?.name || '–';
         }
       });
 
@@ -1969,7 +2747,6 @@
       document.getElementById('kpiTopCat').textContent = topCatName;
       document.getElementById('cashflowSummaryLabel').textContent = `+${Math.round(inc)} € / -${Math.round(exp)} €`;
 
-      // 1. 6-Monats-Cashflow
       const cfContainer = document.getElementById('cashflowBars');
       cfContainer.innerHTML = '';
       const refDate = new Date(state.cursorDate + 'T12:00:00');
@@ -1980,7 +2757,7 @@
         const m = d.getMonth();
         const mStart = `${y}-${String(m + 1).padStart(2, '0')}-01`;
         const mEnd = `${y}-${String(m + 1).padStart(2, '0')}-${String(new Date(y, m + 1, 0).getDate()).padStart(2, '0')}`;
-        const mEntries = getEntriesInWindow(mStart, mEnd);
+        const mEntries = getEntriesInWindow(mStart, mEnd).filter(e => !e.isPending);
 
         let mInc = 0, mExp = 0;
         mEntries.forEach(e => {
@@ -1991,6 +2768,7 @@
         const maxVal = Math.max(mInc, mExp, 500);
         const hInc = Math.max(4, Math.round((mInc / maxVal) * 86));
         const hExp = Math.max(4, Math.round((mExp / maxVal) * 86));
+        const shortMonth = d.toLocaleDateString(loc, { month: 'short' });
 
         const col = document.createElement('div');
         col.className = 'bar-col';
@@ -2000,18 +2778,17 @@
             <div class="bar" style="height:${hInc}px;background:var(--accent)"></div>
             <div class="bar" style="height:${hExp}px;background:var(--danger)"></div>
           </div>
-          <span class="bar-lbl">${MONTHS[m].slice(0,3)}</span>
+          <span class="bar-lbl">${shortMonth}</span>
         `;
         cfContainer.appendChild(col);
       }
 
-      // 2. Top-Kategorien Aufschlüsselung mit Fortschrittsbalken
       const breakEl = document.getElementById('analyticsCatBreakdown');
       breakEl.innerHTML = '';
       const sortedCats = Object.keys(byCat).sort((a, b) => byCat[b] - byCat[a]);
 
       if (sortedCats.length === 0) {
-        breakEl.innerHTML = `<div style="font-size:12px;color:var(--muted)">Noch keine Ausgaben im gewählten Zeitraum.</div>`;
+        breakEl.innerHTML = `<div style="font-size:12px;color:var(--muted)">${t('emptyAnalyticsCats')}</div>`;
       } else {
         sortedCats.forEach(cid => {
           const cat = state.categories.find(c => c.id === cid);
@@ -2021,7 +2798,7 @@
           row.className = 'cat-breakdown-row';
           row.innerHTML = `
             <div class="cat-breakdown-head">
-              <span style="font-weight:600">${cat?.name || 'Kategorie'}</span>
+              <span style="font-weight:600">${cat?.name || ''}</span>
               <span style="color:var(--muted)">${formatEUR(val)} (${pct}%)</span>
             </div>
             <div class="progress-track">
@@ -2032,7 +2809,6 @@
         });
       }
 
-      // 3. Zinseszins-Projektion (1J, 3J, 5J, 10J auf Basis aktiver Investments)
       const wContainer = document.getElementById('wealthBars');
       wContainer.innerHTML = '';
       const horizons = [1, 3, 5, 10];
@@ -2061,22 +2837,24 @@
         const col = document.createElement('div');
         col.className = 'bar-col';
         col.innerHTML = `
-          <span class="bar-val-top">${Math.round(p.val).toLocaleString('de-DE')} €</span>
+          <span class="bar-val-top">${Math.round(p.val).toLocaleString(loc)} €</span>
           <div class="bar-pair">
             <div class="bar" style="height:${h}px;background:var(--accent);width:22px"></div>
           </div>
-          <span class="bar-lbl">+${p.yr} J.</span>
+          <span class="bar-lbl">+${p.yr}${t('yearShort')}</span>
         `;
         wContainer.appendChild(col);
       });
     }
 
     function renderAll() {
-      // Header-Sichtbarkeit je nach Tab steuern
       const isCatTab = currentTab === 'categories';
       document.getElementById('periodNavWrap').style.display = isCatTab ? 'none' : 'flex';
       document.getElementById('staticHeaderTitle').style.display = isCatTab ? 'block' : 'none';
-      document.getElementById('homeSubBar').style.display = currentTab === 'home' ? 'flex' : 'none';
+      // Gleiche Kalender-Körnung auf Start, Investments und Auswertung sichtbar!
+      document.getElementById('calendarSubBar').style.display = isCatTab ? 'none' : 'flex';
+      // Filter-Button nur auf der Startseite rechts unter dem Zahnrad
+      document.getElementById('filterBtn').style.visibility = currentTab === 'home' ? 'visible' : 'hidden';
 
       renderHome();
       renderCategories();
@@ -2112,9 +2890,12 @@
 
     function openSettings() {
       haptic();
+      document.getElementById('themeSwitch').classList.toggle('on', state.theme === 'dark');
+      document.getElementById('vibeSwitch').classList.toggle('on', !!state.vibrate);
       document.getElementById('notifSwitch').classList.toggle('on', !!state.notifEnabled);
       document.getElementById('notifTimeField').style.display = state.notifEnabled ? 'block' : 'none';
       document.getElementById('notifTimeInput').value = state.notifTime || '20:00';
+      document.getElementById('langSelect').value = state.lang;
       document.getElementById('modal-settings').classList.add('open');
     }
 
@@ -2122,7 +2903,6 @@
       document.querySelectorAll('.fullscreen-modal').forEach(m => m.classList.remove('open'));
     }
 
-    // Custom Kategorie-Bottom-Sheet
     function openCategorySheet(mode) {
       haptic();
       sheetMode = mode;
@@ -2139,7 +2919,7 @@
       });
 
       if (available.length === 0) {
-        list.innerHTML = `<div class="empty-hint">Noch keine passende Kategorie vorhanden. Lege zuerst eine im Reiter „Kategorien“ an.</div>`;
+        list.innerHTML = `<div class="empty-hint">${t('noMatchingCat')}</div>`;
       } else {
         available.forEach(c => {
           const row = document.createElement('div');
@@ -2160,9 +2940,6 @@
 
     function selectCategoryFromSheet(cid) {
       haptic();
-      const cat = state.categories.find(c => c.id === cid);
-      if (!cat) return;
-
       if (sheetMode === 'entry') {
         selectedEntryCatId = cid;
         updateEntryCategoryDisplay();
@@ -2179,7 +2956,7 @@
       if (!cat) {
         box.innerHTML = `
           <div class="cat-icon" style="width:28px;height:28px;background:var(--border)"></div>
-          <span style="font-size:14px;font-weight:600;color:var(--muted)">Kategorie wählen</span>
+          <span style="font-size:14px;font-weight:600;color:var(--muted)">${t('chooseCategory')}</span>
         `;
       } else {
         box.innerHTML = `
@@ -2193,7 +2970,7 @@
       const box = document.getElementById('parentCategoryDisplay');
       const cat = state.categories.find(c => c.id === selectedParentCatId);
       if (!cat) {
-        box.innerHTML = `<span style="font-size:14px;font-weight:600;color:var(--muted)">Hauptkategorie wählen</span>`;
+        box.innerHTML = `<span style="font-size:14px;font-weight:600;color:var(--muted)">${t('chooseParent')}</span>`;
       } else {
         box.innerHTML = `
           <div class="cat-icon" style="width:28px;height:28px;background:${getCatColor(cat)}">${ICONS[cat.icon || 'home']}</div>
@@ -2206,7 +2983,6 @@
       document.getElementById('categorySheet').classList.remove('open');
     }
 
-    // Buchungs-Modal
     function openEntryModal(id = null) {
       haptic();
       editingEntryId = id;
@@ -2234,10 +3010,10 @@
       document.getElementById('modal-entry').classList.add('open');
     }
 
-    function setEntryType(t) {
-      entryType = t;
-      document.querySelectorAll('#modal-entry .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.etype === t));
-      const targetType = t === 'income' ? 'income' : 'expense';
+    function setEntryType(tp) {
+      entryType = tp;
+      document.querySelectorAll('#modal-entry .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.etype === tp));
+      const targetType = tp === 'income' ? 'income' : 'expense';
       const firstMatch = state.categories.find(c => c.type === targetType);
       selectedEntryCatId = firstMatch ? firstMatch.id : null;
       updateEntryCategoryDisplay();
@@ -2251,14 +3027,15 @@
     function saveEntry() {
       const amount = parseFloat(document.getElementById('entryAmount').value);
       if (!amount || amount <= 0) {
-        showToast('Bitte Betrag eingeben');
+        showToast(t('toastEnterAmount'));
         return;
       }
       if (!selectedEntryCatId) {
-        showToast('Bitte Kategorie wählen');
+        showToast(t('toastSelectCat'));
         return;
       }
 
+      const isNew = !editingEntryId;
       const data = {
         id: editingEntryId || 'e' + Date.now(),
         type: entryType,
@@ -2279,17 +3056,30 @@
 
       closeModals();
       renderAll();
-      showToast('Buchung gespeichert');
+      showToast(t('toastSaved'));
+
+      // Nach der 2. Buchung einmalig nach täglicher Benachrichtigung fragen!
+      if (isNew && state.entries.length === 2 && !state.notifEnabled && !state.notifPromptShown) {
+        state.notifPromptShown = true;
+        saveState();
+        setTimeout(() => {
+          document.getElementById('modal-notif-prompt').classList.add('open');
+        }, 450);
+      }
+    }
+
+    async function acceptSecondEntryNotification() {
+      closeModals();
+      await toggleDailyNotification(true);
     }
 
     function deleteEntry() {
       state.entries = state.entries.filter(x => x.id !== editingEntryId);
       closeModals();
       renderAll();
-      showToast('Gelöscht');
+      showToast(t('toastDeleted'));
     }
 
-    // Kategorie-Modal mit 18 Farben & sortierten Themen-Icons
     function openCategoryModal(id = null) {
       haptic();
       editingCatId = id;
@@ -2334,10 +3124,10 @@
 
       const container = document.getElementById('iconGroupsContainer');
       container.innerHTML = '';
-      Object.entries(ICON_GROUPS).forEach(([groupTitle, iconsObj]) => {
+      Object.entries(ICON_GROUPS).forEach(([groupKey, iconsObj]) => {
         const titleEl = document.createElement('div');
         titleEl.className = 'icon-group-title';
-        titleEl.textContent = groupTitle;
+        titleEl.textContent = t(groupKey);
         container.appendChild(titleEl);
 
         const grid = document.createElement('div');
@@ -2353,9 +3143,9 @@
       });
     }
 
-    function setCatType(t) {
-      catType = t;
-      document.querySelectorAll('#modal-category .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.ctype === t));
+    function setCatType(tp) {
+      catType = tp;
+      document.querySelectorAll('#modal-category .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.ctype === tp));
     }
 
     function toggleSubcatSwitch() {
@@ -2387,17 +3177,16 @@
 
       closeModals();
       renderAll();
-      showToast('Kategorie gespeichert');
+      showToast(t('toastSaved'));
     }
 
     function deleteCategory() {
       state.categories = state.categories.filter(x => x.id !== editingCatId);
       closeModals();
       renderAll();
-      showToast('Gelöscht');
+      showToast(t('toastDeleted'));
     }
 
-    // Investment-Modal
     function openInvestmentModal(id = null) {
       haptic();
       editingInvId = id;
@@ -2447,9 +3236,12 @@
     }
 
     function saveInvestment() {
-      const name = document.getElementById('invName').value.trim() || 'Portfolio';
+      const name = document.getElementById('invName').value.trim() || t('portfolio');
       const amount = parseFloat(document.getElementById('invAmount').value);
-      if (!amount || amount <= 0) return;
+      if (!amount || amount <= 0) {
+        showToast(t('toastEnterAmount'));
+        return;
+      }
 
       const isRec = document.getElementById('invRecurring').classList.contains('on');
       const hasFee = !isRec && document.getElementById('invHasFee').classList.contains('on');
@@ -2474,25 +3266,26 @@
 
       closeModals();
       renderAll();
-      showToast('Investment gespeichert');
+      showToast(t('toastSaved'));
     }
 
     function deleteInvestment() {
       state.investments = state.investments.filter(x => x.id !== editingInvId);
       closeModals();
       renderAll();
-      showToast('Gelöscht');
+      showToast(t('toastDeleted'));
     }
 
-    // Tägliche Handy-Benachrichtigung statt nervigem Banner
-    async function toggleDailyNotification() {
+    async function toggleDailyNotification(forceOn = false) {
       const sw = document.getElementById('notifSwitch');
-      const next = !sw.classList.contains('on');
+      const next = forceOn ? true : !sw.classList.contains('on');
 
       if (next && 'Notification' in window) {
         const perm = await Notification.requestPermission();
         if (perm !== 'granted') {
-          showToast('Bitte Benachrichtigungen im System erlauben');
+          state.notifEnabled = false;
+          sw.classList.remove('on');
+          saveState();
           return;
         }
       }
@@ -2501,13 +3294,13 @@
       sw.classList.toggle('on', next);
       document.getElementById('notifTimeField').style.display = next ? 'block' : 'none';
       saveState();
-      if (next) showToast(`Tägliche Erinnerung um ${state.notifTime} Uhr aktiv`);
+      if (next) showToast(t('toastNotifActive'));
     }
 
     function saveNotificationTime() {
       state.notifTime = document.getElementById('notifTimeInput').value || '20:00';
       saveState();
-      showToast(`Erinnerung auf ${state.notifTime} Uhr gestellt`);
+      showToast(t('toastSaved'));
     }
 
     function checkDailyNotificationTrigger() {
@@ -2520,9 +3313,9 @@
         saveState();
         if (navigator.serviceWorker && navigator.serviceWorker.ready) {
           navigator.serviceWorker.ready.then(reg => {
-            reg.showNotification('FinanzOS', {
-              body: 'Zeit für deinen kurzen Tagesabschluss.',
-              silent: false
+            reg.showNotification('Cashview', {
+              body: t('notifPromptSub'),
+              icon: './icon.png'
             });
           });
         }
@@ -2540,14 +3333,22 @@
     }
 
     function toggleTheme() {
-      const html = document.documentElement;
-      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      html.setAttribute('data-theme', next);
-      document.getElementById('themeSwitch').classList.toggle('on', next === 'dark');
+      haptic();
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', state.theme);
+      document.getElementById('themeSwitch').classList.toggle('on', state.theme === 'dark');
+      saveState();
+    }
+
+    function toggleVibration() {
+      state.vibrate = !state.vibrate;
+      document.getElementById('vibeSwitch').classList.toggle('on', state.vibrate);
+      if (state.vibrate) haptic();
+      saveState();
     }
 
     function exportCSV() {
-      const rows = [['Datum','Typ','Betrag','Kategorie','Notiz']];
+      const rows = [['Date','Type','Amount','Category','Note']];
       state.entries.forEach(e => {
         const c = state.categories.find(x => x.id === e.categoryId)?.name || '';
         rows.push([e.date, e.type, e.amount, c, e.note || '']);
@@ -2556,17 +3357,18 @@
       const blob = new Blob([csv], { type: 'text/csv' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'finanzos_export.csv';
+      a.download = 'cashview_export.csv';
       a.click();
-      showToast('CSV exportiert');
+      showToast(t('toastCsv'));
     }
 
     function resetAllData() {
-      localStorage.removeItem('finanzos_v4');
+      if (!confirm(t('confirmReset'))) return;
+      localStorage.removeItem('cashview_v1');
       location.reload();
     }
 
-    // Visuelle Einführungsreise (Langsam & Interaktiv zum Selbst-Einrichten)
+    // Visuelle Einführungsreise (ohne Benachrichtigungsfrage)
     function renderOnboarding() {
       const stage = document.getElementById('onboardStage');
       const dots = document.getElementById('onboardDots');
@@ -2582,45 +3384,35 @@
       if (onboardStep === 0) {
         stage.innerHTML = `
           <div class="journey-orb">${ICONS.trend}</div>
-          <h2 style="font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:10px">Willkommen bei FinanzOS.</h2>
-          <p style="font-size:14px;color:var(--muted);line-height:1.6;max-width:290px">
-            Eine ruhige, mathematisch präzise Umgebung für dein Vermögen, deine Ausgaben und deine Investments.
-          </p>
+          <h2 style="font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:10px">${t('onb1Title')}</h2>
+          <p style="font-size:14px;color:var(--muted);line-height:1.6;max-width:290px">${t('onb1Sub')}</p>
         `;
-        act.innerHTML = `<button class="primary-btn" onclick="nextOnboard()">Reise starten</button>`;
+        act.innerHTML = `<button class="primary-btn" onclick="nextOnboard()">${t('onb1Btn')}</button>`;
       } else if (onboardStep === 1) {
         stage.innerHTML = `
           <div class="journey-orb">${ICONS.home}</div>
-          <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Wähle deine Grundstruktur.</h2>
-          <p style="font-size:13px;color:var(--muted);max-width:290px">
-            Tippe die Kategorien an, mit denen du starten möchtest. Du kannst sie jederzeit frei erweitern.
-          </p>
+          <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">${t('onb2Title')}</h2>
+          <p style="font-size:13px;color:var(--muted);max-width:290px">${t('onb2Sub')}</p>
           <div class="chip-grid">
             ${STARTER_PRESETS.map(p => `
-              <div class="Preset-chip ${selectedStarterKeys.includes(p.key) ? 'selected' : ''}" onclick="toggleStarterPreset('${p.key}')">
+              <div class="preset-chip ${selectedStarterKeys.includes(p.key) ? 'selected' : ''}" onclick="toggleStarterPreset('${p.key}')">
                 <span style="color:${p.color};display:flex">${ICONS[p.icon]}</span>
-                <span>${p.name}</span>
+                <span>${t('preset_' + p.key)}</span>
               </div>
             `).join('')}
           </div>
         `;
-        act.innerHTML = `<button class="primary-btn" onclick="nextOnboard()">Weiter</button>`;
+        act.innerHTML = `<button class="primary-btn" onclick="nextOnboard()">${t('onb2Btn')}</button>`;
       } else if (onboardStep === 2) {
         stage.innerHTML = `
           <div class="journey-orb">${ICONS.wallet}</div>
-          <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">Startbestand & Erinnerung</h2>
-          <p style="font-size:13px;color:var(--muted);margin-bottom:16px;max-width:290px">
-            Trage optional deinen aktuellen Kontostand ein oder starte direkt bei 0,00 €.
-          </p>
+          <h2 style="font-size:22px;font-weight:700;margin-bottom:8px">${t('onb3Title')}</h2>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:18px;max-width:290px">${t('onb3Sub')}</p>
           <div style="width:100%;max-width:280px">
-            <input id="onboardInitialBalance" type="number" step="0.01" placeholder="0,00 € Startbetrag (optional)" class="input" style="text-align:center;margin-bottom:12px" />
-            <div class="toggle-row" onclick="toggleOnboardNotif()">
-              <span style="font-size:13px">Tägliche Handy-Erinnerung</span>
-              <div id="onboardNotifSwitch" class="switch ${state.notifEnabled ? 'on' : ''}"></div>
-            </div>
+            <input id="onboardInitialBalance" type="number" step="0.01" placeholder="${t('onb3Placeholder')}" class="input" style="text-align:center" />
           </div>
         `;
-        act.innerHTML = `<button class="primary-btn" onclick="finishOnboarding()">FinanzOS öffnen</button>`;
+        act.innerHTML = `<button class="primary-btn" onclick="finishOnboarding()">${t('onb3Btn')}</button>`;
       }
     }
 
@@ -2631,11 +3423,6 @@
       } else {
         selectedStarterKeys.push(key);
       }
-      renderOnboarding();
-    }
-
-    async function toggleOnboardNotif() {
-      await toggleDailyNotification();
       renderOnboarding();
     }
 
@@ -2653,7 +3440,7 @@
           if (p) {
             state.categories.push({
               id: 'c_init_' + idx,
-              name: p.name,
+              name: t('preset_' + p.key),
               type: p.type,
               color: p.color,
               icon: p.icon,
@@ -2667,7 +3454,7 @@
       if (initBal && initBal > 0) {
         let incCat = state.categories.find(c => c.type === 'income');
         if (!incCat) {
-          incCat = { id: 'c_start_inc', name: 'Startbestand', type: 'income', color: '#00D09C', icon: 'wallet', parentId: null };
+          incCat = { id: 'c_start_inc', name: t('initBalanceName'), type: 'income', color: '#00D09C', icon: 'wallet', parentId: null };
           state.categories.push(incCat);
         }
         state.entries.push({
@@ -2675,7 +3462,7 @@
           type: 'income',
           amount: initBal,
           categoryId: incCat.id,
-          note: 'Startbestand',
+          note: t('initBalanceName'),
           date: getTodayISO(),
           recurring: false
         });
@@ -2684,7 +3471,6 @@
       state.onboarded = true;
       closeModals();
       renderAll();
-      showToast('Bereit');
     }
 
     function replayOnboarding() {
@@ -2694,10 +3480,17 @@
       document.getElementById('modal-onboarding').classList.add('open');
     }
 
+    // Initialisierung & Splash-Screen-Übergang
+    document.documentElement.setAttribute('data-theme', state.theme || 'dark');
+    applyLanguageTexts();
     if (!state.onboarded) {
       replayOnboarding();
     }
     renderAll();
+
+    setTimeout(() => {
+      document.getElementById('splashScreen').classList.add('hidden');
+    }, 1350);
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js');
